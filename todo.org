@@ -1,0 +1,4 @@
+* Fix the smartparens stuff
+* Fix savehist
+* Fix recentf
+* Volatile Highlights
