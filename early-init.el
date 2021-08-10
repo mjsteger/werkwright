@@ -3,6 +3,12 @@
 ; Helps speed up startup
 (setq package-enable-at-startup nil)
 
+;; Added this nonsense because I was getting errors on startup from GH library
+(defun gh-marshal-default-spec (slot)
+  (let ((slot-name (symbol-name slot)))
+    (list (cons 'alist
+                (intern (replace-regexp-in-string "-" "_" slot-name))))))
+
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
 ;; larger than the system default.

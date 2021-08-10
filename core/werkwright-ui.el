@@ -1,4 +1,4 @@
-(message "in UI")
+
 (use-package better-defaults)
 
 (setq 
@@ -39,7 +39,7 @@
 (set-selection-coding-system 'utf-8)
 (set-file-name-coding-system 'utf-8)
 (set-clipboard-coding-system 'utf-8)
-(message "before littering")
+
 (use-package no-littering
   :demand t
   :config
@@ -52,7 +52,7 @@
 
 
 ;; [[https://github.com/justbur/emacs-which-key][which-key]] pops up a nice window whenever we hesitate about a keyboard shortcut, and shows all the possible keys we can press. Popularized by Spacemacs and Doom-Emacs, we can now configure absurd key combinations, forget about them, and then be delighted to discover them again!
-(message "before which-key")
+
 (use-package which-key
   :demand t
   :custom
@@ -64,7 +64,7 @@
   (set-face-attribute
     'which-key-local-map-description-face nil :weight 'bold))
 
-(message "before big setq")
+
 ;; (setq ring-bell-function 'ignore ; no bell
 ;;       ;; better scrolling
 ;;       scroll-step 1
@@ -80,7 +80,7 @@
 ;;       ;; don't resize frames a character at a time, but use pixels
 ;;       frame-resize-pixelwise t)
 
-(message "before anzu")
+
 
 (use-package anzu
   :defer 1
@@ -92,7 +92,7 @@
   :defer 1
   :config
   (minions-mode 1))
-(message "after minions")
+
 ;; Always redraw immediately when scrolling, more responsive and doesn't hang! Sourced from http://emacs.stackexchange.com/a/31427/2418
 (setq fast-but-imprecise-scrolling t
       jit-lock-defer-time 0)
@@ -191,5 +191,5 @@
       '("" invocation-name " Werkwright - " (:eval (if (buffer-file-name)
                                             (abbreviate-file-name (buffer-file-name))
                                           "%b"))))
-(message "end of ui")
+
 (provide 'werkwright-ui)

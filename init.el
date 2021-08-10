@@ -8,6 +8,7 @@
 ;; Added this nonsense because I was getting recursive loads from jka-compr
 (setq load-prefer-newer nil)
 (require 'jka-compr)
+
 ;; Always load newest byte code
 ;;(setq load-prefer-newer t)
 ;; Define Werkwright's directory structure
@@ -24,7 +25,7 @@ are loaded automatically by Werkwright.")
   "This directory is for your personal configuration, that you want loaded before Werkwright.")
 (defvar werkwright-savefile-dir (expand-file-name "savefile" user-emacs-directory)
   "This folder stores all the automatically generated save/history-files.")
-(defvar werkwright-modules-file (expand-file-name "werkwright-modules.el" werkwright-personal-dir)
+(defvar werkwright-modules-file (expand-file-name "werkwright-modules.el" werkwright-core-dir)
   "This file contains a list of modules that will be loaded by Werkwright.")
 
 (unless (file-exists-p werkwright-savefile-dir)
@@ -71,7 +72,7 @@ are loaded automatically by Werkwright.")
 	  werkwright-editor)
   (require it))
 
-(message "Loading osx stuff")
+
 ;; macOS specific settings
 (when (eq system-type 'darwin)
   (require 'werkwright-osx))

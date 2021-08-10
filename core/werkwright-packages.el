@@ -1,4 +1,3 @@
-
 (defvar werkwright-packages
   '(ace-window
     ag
@@ -39,9 +38,9 @@
  )
   "A list of packages to ensure are installed at launch.")
 
-;; (-map (lambda (x) (straight-use-package x)) werkwright-packages)
-;; (-map (lambda (x) (require x)) werkwright-packages)
-(message "after maps")
+(-map (lambda (x) (straight-use-package x)) werkwright-packages)
+(-map (lambda (x) (require x)) werkwright-packages)
+
 ;;;; Auto-installation of major modes on demand
 
 (defmacro werkwright-auto-install (extension package mode)
@@ -132,5 +131,5 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
          (mode (cadr (cdr entry))))
        (werkwright-auto-install extension package mode)))
  werkwright-auto-install-alist)
-(message "after packages inside file")
+
 (provide 'werkwright-packages)
