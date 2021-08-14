@@ -299,7 +299,8 @@ The body of the advice is in BODY."
 (winner-mode +1)
 (global-set-key (kbd "M-[") 'winner-undo)
 (global-set-key (kbd "M-]") 'winner-redo)
-(rainbow-delimiters-mode +1)
+(use-package rainbow-delimiters
+  (rainbow-delimiters-mode +1))
 
 ;; diff-hl
 (global-diff-hl-mode +1)

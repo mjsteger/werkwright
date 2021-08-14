@@ -18,6 +18,7 @@
                            (lsp)
                            (lsp-mode)
                            (local-set-key (kbd "M-.") #'lsp-find-definition)
+                           (rainbow-delimiters-mode)
                            ))
 
 (defun lsp-go-install-save-hooks ()
