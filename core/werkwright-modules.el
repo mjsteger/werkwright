@@ -6,6 +6,12 @@
                              efuncs
                              org
                              themes
+                             exwm
+                             smudge
+                             guix
+                             terraform
+                             lisp
+                             editor-tweaks
                              ))
 
 (mapc #'require
@@ -16,3 +22,7 @@
            (--map (concat "werkwright-" it))
            ;; back to symbol for require
            (-map 'intern)))
+
+
+;; Remember you can always remove things from straight if they get into a bad state with
+;; (remhash "rust-mode" straight--recipe-cache)

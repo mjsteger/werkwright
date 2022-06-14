@@ -1,4 +1,3 @@
-
 (use-package better-defaults)
 
 (setq 
@@ -88,11 +87,6 @@
   :config
   (global-anzu-mode 1))
 
-(use-package minions
-  :defer 1
-  :config
-  (minions-mode 1))
-
 ;; Always redraw immediately when scrolling, more responsive and doesn't hang! Sourced from http://emacs.stackexchange.com/a/31427/2418
 (setq fast-but-imprecise-scrolling t
       jit-lock-defer-time 0)
@@ -136,7 +130,6 @@
   :config
   (solaire-global-mode +1))
 
-
 ;; add some space between lines for easier reading.
 (setq-default line-spacing 1)
 
@@ -162,8 +155,6 @@
   (if (string-suffix-p "256color" (getenv "TERM"))
     (enable-256color-term)))
 
-
-
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 
@@ -176,13 +167,22 @@
   :straight (:host github :repo "websymphony/vivid-theme"))
 
 
-;; mode line settings
-(line-number-mode t)
-(column-number-mode t)
-(size-indication-mode t)
+(use-package smart-mode-line
+  :init
+  (setq sml/theme 'respectful)
+  (setq sml/mode-width 1)
+  (line-number-mode t)
+  (column-number-mode t)
+  (display-battery-mode +1)
+  (setq sml/show-time nil)
+  (setq sml/position-percentage-format nil)  
+  (setq rm-whitelist ".*lsp.*")
+  (setq display-time-default-load-average nil)
+  (smart-mode-line-enable)
+  (sml/apply-theme 'respectful)
+  )
 
-
-;; enable y/n answers
+;; enable y/n 
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; more useful frame title, that show either a file or a
@@ -191,5 +191,4 @@
       '("" invocation-name " Werkwright - " (:eval (if (buffer-file-name)
                                             (abbreviate-file-name (buffer-file-name))
                                           "%b"))))
-
 (provide 'werkwright-ui)

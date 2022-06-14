@@ -23,14 +23,14 @@
 
 ;; Following [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom-Emacs FAQ]], we max the garbage collection threshold on startup, and reset it to the original value after.
 
-;; max memory available for gc on startup
-(defvar me/gc-cons-threshold 16777216)
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold me/gc-cons-threshold
-                  gc-cons-percentage 0.1)))
+;; ;; max memory available for gc on startup
+;; (defvar me/gc-cons-threshold 16777216)
+;; (setq gc-cons-threshold most-positive-fixnum
+;;       gc-cons-percentage 0.6)
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (setq gc-cons-threshold me/gc-cons-threshold
+;;                   gc-cons-percentage 0.1)))
 
 ;; max memory available for gc when opening minibuffer
 (defun me/defer-garbage-collection-h ()
@@ -42,7 +42,7 @@
   (run-at-time
    1 nil (lambda () (setq gc-cons-threshold me/gc-cons-threshold))))
 
-(add-hook 'minibuffer-setup-hook #'me/defer-garbage-collection-h)
+;; (add-hook 'minibuffer-setup-hook #'me/defer-garbage-collection-h)
 (add-hook 'minibuffer-exit-hook #'me/restore-garbage-collection-h)
 (setq garbage-collection-messages t)
 
@@ -58,8 +58,8 @@
 
 ;; Optimizations for improving I/O performance. Increase max bytes read from a sub-process in a single op (Emacs 27+)
 (when (boundp 'read-process-output-max)
-  ;; 1MB in bytes, default 4096 bytes
-  (setq read-process-output-max 1048576))
+  ;; 4MB in bytes, default 4096 bytes
+  (setq read-process-output-max 4194304)
 
 ;; [[https://github.com/raxod502/straight.el][straight.el]] is used to download packages for us from all over the web. It stores them all in their respective git folders in =.emacs.d/straight=, which makes debugging, and contributing fixes back upstream as easy as possible.
 
@@ -113,5 +113,6 @@
 (use-package gcmh
   :demand t
   :config
+  ;; Set it to 256MB - 1GB means you will get sad when the gc happens
+  (setq gcmh-high-cons-threshold 268435456)
   (gcmh-mode 1))
-

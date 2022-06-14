@@ -96,4 +96,31 @@ are loaded automatically by Werkwright.")
                werkwright-modules-file
                (directory-files werkwright-personal-dir 't "^[^#\.].*\\.el$"))))
 
-;; init.el ends here
+;; Man do you want a server for emacsclient
+(server-start)
+
+;; Some quick face customizations at the end
+(set-face-attribute 'default nil :height 150)
+(set-face-attribute 'mode-line-inactive nil :background "#353839")
+(set-face-attribute 'minibuffer-prompt nil :foreground "#CDCDCD")
+(set-face-attribute 'ivy-current-match nil :background "#353839")
+
+
+
+(setq-default global-mode-string '(("    "
+  (:eval
+   (smudge-remote-player-status-text)))
+ battery-mode-line-string))
+
+(setq-default mode-line-format
+              '("%e" "%l:%c   " (:eval display-time-string)  (:eval (format " %2.1f " (* 100 (/ (calendar-day-number (calendar-current-date)) 365.0))))  mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification 
+ (vc-mode vc-mode)
+ sml/pre-modes-separator mode-line-modes mode-line-misc-info mode-line-end-spaces)
+              )
+
+
+
+(provide 'init)
+
+;;; init.el ends here
+

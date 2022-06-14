@@ -1,6 +1,7 @@
 (defvar werkwright-packages
   '(ace-window
     ag
+    anzu
     avy
     browse-kill-ring
     crux
@@ -13,8 +14,7 @@
     expand-region
     gist
     git-timemachine
-    gitconfig-mode
-    gitignore-mode
+    git-modes
     guru-mode
     hl-todo
     imenu-anywhere
@@ -40,6 +40,13 @@
 
 (-map (lambda (x) (straight-use-package x)) werkwright-packages)
 (-map (lambda (x) (require x)) werkwright-packages)
+
+;; (define-globalized-minor-mode my-global-rainbow-mode rainbow-mode
+;;   (lambda () (rainbow-mode 1)))
+
+;; (my-global-rainbow-mode 1)
+
+;; remove with e.g. (remhash "smart-mode-line" straight--repo-cache)
 
 ;;;; Auto-installation of major modes on demand
 
@@ -74,6 +81,7 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
     ("\\.go\\'" go-mode go-mode)
     ("\\.graphql\\'" graphql-mode graphql-mode)
     ("\\.groovy\\'" groovy-mode groovy-mode)
+    ("\\.pdf\\'" pdf-tools doc-view-mode)
     ("\\.haml\\'" haml-mode haml-mode)
     ("\\.hs\\'" haskell-mode haskell-mode)
     ("\\.jl\\'" julia-mode julia-mode)

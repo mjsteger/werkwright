@@ -111,11 +111,9 @@
 (volatile-highlights-mode t)
 (diminish 'volatile-highlights-mode)
 
-
 ;; tramp, for sudo access
 (require 'tramp)
 (setq tramp-default-method "ssh")
-
 
 ;; flyspell-mode does spell-checking on the fly as you type
 (require 'flyspell)
@@ -124,6 +122,11 @@
 
 (defcustom werkwright-whitespace t
   "Non-nil values enable Werkwright's whitespace visualization."
+  :type 'boolean
+  :group 'werkwright)
+
+(defcustom werkwright-clean-whitespace-on-save t
+  "Non-nil values enable Werkwright's whitespace clean on save."
   :type 'boolean
   :group 'werkwright)
 
@@ -171,6 +174,10 @@
 (setq bookmark-default-file (expand-file-name "bookmarks" werkwright-savefile-dir)
       bookmark-save-flag 1)
 
+(use-package git-link
+  :config
+  (global-set-key (kbd "C-c g l") 'git-link))
+
 ;; projectile is a project management mode
 (require 'projectile)
 (setq projectile-cache-file (expand-file-name  "projectile.cache" werkwright-savefile-dir))
@@ -213,7 +220,7 @@
 ;; smarter kill-ring navigation
 (use-package browse-kill-ring)
 ;; (browse-kill-ring-default-keybindings)
-;; (global-set-key (kbd "s-y") 'browse-kill-ring)
+(global-set-key (kbd "s-y") 'browse-kill-ring)
 
 (require 'tabify)
 (defmacro with-region-or-buffer (func)
@@ -299,8 +306,12 @@ The body of the advice is in BODY."
 (winner-mode +1)
 (global-set-key (kbd "M-[") 'winner-undo)
 (global-set-key (kbd "M-]") 'winner-redo)
+
 (use-package rainbow-delimiters
-  (rainbow-delimiters-mode +1))
+  :config
+  (rainbow-delimiters-mode +1)
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
 
 ;; diff-hl
 (global-diff-hl-mode +1)
@@ -358,7 +369,31 @@ and file 'filename' will be opened and cursor set on line 'linenumber'"
   :config
   (prescient-persist-mode 1))
 
+
+(defun swiper-C-r (&optional arg)
+  "Move cursor vertically down ARG candidates.
+If the input is empty, select the previous history element instead."
+  (interactive "p")
+  (if (string= ivy-text "")
+      (ivy-next-history-element 1)
+    (ivy-previous-line arg)))
+
+
 (use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         ("C-r" . swiper-backward)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-f" . ivy-alt-done)
+         ("C-s" . swiper)
+         ("C-r" . swiper-C-r)
+         ("C-w" . ivy-yank-word)
+         :map ivy-switch-buffer-map         
+         ("C-l" . ivy-done)
+         ("TAB" . ivy-alt-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         )
   :defer 0.1
   :custom
   ;; add bookmarks and recentf to buffer lists
@@ -366,7 +401,11 @@ and file 'filename' will be opened and cursor set on line 'linenumber'"
   ;; better matching method
   (ivy-re-builders-alist '((t . ivy--regex-plus)))
   :config
-  (ivy-mode 1))
+  (ivy-mode 1)
+  (setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
+  (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
+  (setf (alist-get 'swiper ivy-height-alist) 15)
+  (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7))
 
 (use-package counsel
   :defer 0.1
@@ -392,13 +431,28 @@ and file 'filename' will be opened and cursor set on line 'linenumber'"
                           ivy-rich-switch-buffer-align-virtual-buffer t
                           ivy-rich-path-style 'abbrev)
 
-  :after ivy counsel all-the-icons-ivy-rich
+  :after ivy counsel
   :config
   (ivy-set-display-transformer 'ivy-switch-buffer
                                'ivy-rich-switch-buffer-transformer)
 
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
   (ivy-rich-mode 1)
+  (setq ivy-rich-display-transformers-list
+        (plist-put ivy-rich-display-transformers-list
+                   'ivy-switch-buffer
+                   '(:columns
+                     ((ivy-rich-candidate (:width 40))
+                      (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right)); return the buffer indicators
+                      (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))          ; return the major mode info
+                      (ivy-rich-switch-buffer-project (:width 15 :face success))             ; return project name using `projectile'
+                      (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))  ; return file path relative to project root or `default-directory' if project is nil
+                     :predicate
+                     (lambda (cand)
+                       (if-let ((buffer (get-buffer cand)))
+                           ;; Don't mess with EXWM buffers
+                           (with-current-buffer buffer
+                             (not (derived-mode-p 'exwm-mode))))))))
   (setq ivy-initial-inputs-alist nil))
 
 (use-package ivy-posframe
@@ -458,13 +512,41 @@ and file 'filename' will be opened and cursor set on line 'linenumber'"
   :commands format-all-mode
   :hook (after-change-major-mode . me/maybe-format-all-mode))
 
-(use-package vterm)
+(use-package vterm
+  :config
+  (setq vterm-max-scrollback 100000)
+  (setq vterm-timer-delay 0.01)
+  (global-set-key (kbd "M-p") 'multi-vterm-prev)
+  (global-set-key (kbd "M-n") 'multi-vterm-next)
+  (define-key vterm-mode-map (kbd "M-p") 'multi-vterm-prev)
+  (define-key vterm-mode-map (kbd "M-n") 'multi-vterm-next)
+  (push '("vterm-copy-mode" vterm-copy-mode) vterm-eval-cmds)
+  (push '("recenter-top-bottom" recenter-top-bottom) vterm-eval-cmds)
+  (push '("vterm-clear" vterm-clear) vterm-eval-cmds)  
+  (defun vterm-counsel-yank-pop-action (orig-fun &rest args)
+    (if (equal major-mode 'vterm-mode)
+        (let ((inhibit-read-only t)
+              (yank-undo-function (lambda (_start _end) (vterm-undo))))
+          (cl-letf (((symbol-function 'insert-for-yank)
+                     (lambda (str) (vterm-send-string str t))))
+            (apply orig-fun args)))
+      (apply orig-fun args)))
+
+  (advice-add 'counsel-yank-pop-action :around #'vterm-counsel-yank-pop-action)
+  )
+
+(use-package multi-vterm :ensure t)
+
 
 ;; For the love of god - when you type something w/ a mark, delete that
 (delete-selection-mode +1)
 
+;; Shameless stolen from perspective's thoughts - https://github.com/nex3/perspective-el#some-musings-on-emacs-window-layouts
+(customize-set-variable 'display-buffer-base-action
+  '((display-buffer-reuse-window display-buffer-same-window)
+    (reusable-frames . t)))
 
-
+(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
 
 ;; [[https://github.com/iqbalansari/restart-emacs][restart-emacs]] teaches Emacs to restart itself. I added a ~me/reload-init~ command as well to just reload the =init.el= file without a full restart.
 
@@ -478,6 +560,14 @@ and file 'filename' will be opened and cursor set on line 'linenumber'"
 (use-package restart-emacs
   :commands restart-emacs
   )
+
+(setq display-time-24hr-format t)
+(setq display-time-day-and-date t)
+
+;; This gives you second ticking. Turn off if it gets laggy
+(setq display-time-interval 1)
+(setq display-time-format (concat "%H:%M:%S %d/%m"))
+(display-time-mode 1)
 
 
 (provide 'werkwright-editor)
