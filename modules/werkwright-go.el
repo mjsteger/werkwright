@@ -1,21 +1,6 @@
-(use-package dap-mode
-  )
-
-(require 'dap-go)
+(use-package dap-mode)
 
 ;; (dap-go-setup)
-
-(use-package gotest
-  :config
-  (require 'gotest)
-  (require 'gotest-autoloads)
-  (add-to-list 'popper-reference-buffers 'go-test-mode)
-  (add-hook 'go-mode-hook (lambda ()
-                            (define-key go-mode-map (kbd "C-c C-c C-f") 'go-test-current-file)
-                            (define-key go-mode-map (kbd "C-C C-C C-c") 'go-test-current-test)
-                            (define-key go-mode-map (kbd "C-c C-c C-t") 'go-test-current-project)
-                            ))
-  )
 
 (require 'werkwright-lsp)
 (require 'lsp-go)
@@ -79,6 +64,18 @@
     ("Level" 8 flycheck-error-list-entry-level-<)
     ("ID" 20 t)
     (,(flycheck-error-list-make-last-column "Message" 'Checker) 0 t)])
+
+(use-package gotest
+  :init
+  ;; If you don't require it first, if it requires in later it will overwrite our binds here
+  (require 'go-mode)
+  (add-to-list 'popper-reference-buffers 'go-test-mode)
+  :bind (:map go-mode-map
+              (("C-c C-c C-f" . go-test-current-file)
+               ("C-C C-C C-c" . go-test-current-test)
+              ("C-c C-c C-t" . go-test-current-project)
+              ))
+  )
 
 (provide 'werkwright-go)
 

@@ -24,7 +24,6 @@ popup buffer as current, so you can use buffer-local variables."
 
 (use-package popper
   :init
-  (popper-mode +1)
   (popper-echo-mode +1)
   (setq popper-group-function #'popper-group-by-steggy)
   (setq popper-display-control t)
@@ -37,6 +36,7 @@ popup buffer as current, so you can use buffer-local variables."
                                                    (< (count-lines (point-min) (point-max))
                                                       10))))
                                    ))
+  (popper-mode +1)
   )
 
 (use-package whitespace-cleanup-mode
@@ -51,5 +51,10 @@ popup buffer as current, so you can use buffer-local variables."
 )
 
 (use-package tree-sitter-langs)
+
+(use-package envrc
+  :init
+  (envrc-global-mode)
+  )
 
 (provide 'werkwright-editor-tweaks)
