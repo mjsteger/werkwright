@@ -152,8 +152,11 @@
     (add-hook 'before-save-hook 'werkwright-cleanup-maybe nil t)
     (whitespace-mode +1)))
 
-(add-hook 'text-mode-hook 'werkwright-enable-flyspell)
+;; It's pretty slow and mispellings aren't a big problem for me; not worth it
+;; (add-hook 'text-mode-hook 'werkwright-enable-flyspell)
 (add-hook 'text-mode-hook 'werkwright-enable-whitespace)
+;; Always make bad whitespace visible
+(global-whitespace-mode)
 
 ;; enable narrowing commands
 (put 'narrow-to-region 'disabled nil)
@@ -182,6 +185,8 @@
 (require 'projectile)
 (setq projectile-cache-file (expand-file-name  "projectile.cache" werkwright-savefile-dir))
 (projectile-mode t)
+
+(use-package projectile-ripgrep)
 
 ;; avy allows us to effectively navigate to visible things
 (require 'avy)
@@ -389,7 +394,7 @@ If the input is empty, select the previous history element instead."
          ("C-s" . swiper)
          ("C-r" . swiper-C-r)
          ("C-w" . ivy-yank-word)
-         :map ivy-switch-buffer-map         
+         :map ivy-switch-buffer-map
          ("C-l" . ivy-done)
          ("TAB" . ivy-alt-done)
          ("C-d" . ivy-switch-buffer-kill)
@@ -406,6 +411,8 @@ If the input is empty, select the previous history element instead."
   (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
   (setf (alist-get 'swiper ivy-height-alist) 15)
   (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7))
+
+(use-package ivy-hydra)
 
 (use-package counsel
   :defer 0.1
@@ -466,7 +473,10 @@ If the input is empty, select the previous history element instead."
 ;; [[http://company-mode.github.io/][company-mode]] gives us the standard dropdown as-you-type of modern IDEs.
 (use-package company
   :config
-  (global-company-mode 1))
+  (setq company-minimum-prefix-length 1)
+  (setq company-idle-delay 0)
+  (global-company-mode 1)
+  )
 
 (use-package company-prescient
   :after company prescient
@@ -489,6 +499,12 @@ If the input is empty, select the previous history element instead."
   (flycheck-posframe-configure-pretty-defaults)
   (add-hook 'flycheck-posframe-inhibit-functions #'company--active-p)
   (advice-add 'org-edit-src-exit :after #'flycheck-posframe-hide-posframe))
+
+(use-package transient-posframe
+  :config
+  (transient-posframe-mode t)
+  (setq transient-posframe-poshandler 'posframe-poshandler-point-window-center)
+  )
 
 ;; [[https://github.com/lassik/emacs-format-all-the-code][emacs-format-all-the-code]] knows about all the different formatters for different languuages, and tries to run them if they are installed. We configure it to format all modes that are in the ~auto-format-modes~ list on save. We well add modes to this later.
 (defcustom auto-format-modes '()
@@ -521,22 +537,51 @@ If the input is empty, select the previous history element instead."
   (define-key vterm-mode-map (kbd "M-p") 'multi-vterm-prev)
   (define-key vterm-mode-map (kbd "M-n") 'multi-vterm-next)
   (push '("vterm-copy-mode" vterm-copy-mode) vterm-eval-cmds)
-  (push '("recenter-top-bottom" recenter-top-bottom) vterm-eval-cmds)
-  (push '("vterm-clear" vterm-clear) vterm-eval-cmds)  
-  (defun vterm-counsel-yank-pop-action (orig-fun &rest args)
+  ;; (push '("recenter-top-bottom" recenter-top-bottom) vterm-eval-cmds)
+  ;; (push '("vterm-clear" vterm-clear) vterm-eval-cmds)
+  (setq vterm-buffer-name-string nil)
+  (setq vterm-eval-cmds '(("find-file" find-file)
+                          ("vterm-clear-scrollback" (lambda () (recenter-top-bottom 'top)))
+                          ("dired" dired)
+                          ("ediff-files" ediff-files)))
+
+  (setq dabbrev-case-fold-search nil)
+
+  ;; Jank that lets you do dabbrev in vterm. Worth it!
+  (defun vterm-dabbrev-completion (&optional args)
+    (interactive "P")
     (if (equal major-mode 'vterm-mode)
         (let ((inhibit-read-only t)
-              (yank-undo-function (lambda (_start _end) (vterm-undo))))
-          (cl-letf (((symbol-function 'insert-for-yank)
-                     (lambda (str) (vterm-send-string str t))))
-            (apply orig-fun args)))
+              (in-dabbrev t))
+          (dabbrev-completion args))
+      (dabbrev-completion args)))
+
+  (global-set-key (kbd "C-M-/") #'vterm-dabbrev-completion)
+
+(defun vterm-ivy-completion-in-region-action (orig-fun &rest args)
+  (if (and (equal major-mode 'vterm-mode)
+           (equal in-dabbrev t))
+        (let ((inhibit-read-only t))
+          (dotimes (i (length dabbrev--last-abbreviation))
+                    (vterm-send-backspace))
+          (vterm-insert (car args)))
       (apply orig-fun args)))
 
-  (advice-add 'counsel-yank-pop-action :around #'vterm-counsel-yank-pop-action)
+  (advice-add 'ivy-completion-in-region-action :around #'vterm-ivy-completion-in-region-action)
+
+  ;; (defun vterm-counsel-yank-pop-action (orig-fun &rest args)
+  ;;   (if (equal major-mode 'vterm-mode)
+  ;;       (let ((inhibit-read-only t)
+  ;;             (yank-undo-function (lambda (_start _end) (vterm-undo))))
+  ;;         (cl-letf (((symbol-function 'insert-for-yank)
+  ;;                    (lambda (str) (vterm-send-string str t))))
+  ;;           (apply orig-fun args)))
+  ;;     (apply orig-fun args)))
+
+  ;; (advice-add 'counsel-yank-pop-action :around #'vterm-counsel-yank-pop-action)
   )
 
 (use-package multi-vterm :ensure t)
-
 
 ;; For the love of god - when you type something w/ a mark, delete that
 (delete-selection-mode +1)
@@ -569,5 +614,16 @@ If the input is empty, select the previous history element instead."
 (setq display-time-format (concat "%H:%M:%S %d/%m"))
 (display-time-mode 1)
 
+(setq fill-column 80)
+
+(require 'desktop)
+(setq desktop-save 1
+      desktop-load-locked-desktop t
+      desktop-dirname user-emacs-directory
+      desktop-restore-frames nil
+      ;; Don't save remote files and/or *gpg files.
+      desktop-files-not-to-save "\\(^/[^/:]*:\\|(ftp)$\\)\\|\\(\\.gpg$\\)")
+
+(desktop-save-mode 1)
 
 (provide 'werkwright-editor)

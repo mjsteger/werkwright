@@ -8,3 +8,5 @@
   (define-key rust-mode-map (kbd "C-@") 'lsp-extend-selection)
   (setq rustic-format-trigger 'on-save)
   )
+
+(provide 'werkwright-rust)

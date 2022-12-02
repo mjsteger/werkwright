@@ -23,6 +23,7 @@
   :config
   (require 'yasnippet)
   (yas-global-mode)
+  (add-hook 'snippet-mode-hook #'(lambda ()(setq-local require-final-newline nil)))
   (global-set-key (kbd "M-i") 'company-yasnippet)
   )
 (use-package yasnippet-snippets

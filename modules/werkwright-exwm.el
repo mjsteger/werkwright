@@ -4,6 +4,11 @@
 
 (require 'exwm-edit)
 
+(defun other-exwm-workspace()
+  (interactive)
+  (dotimes (i (length exwm-workspace--list))
+    (when (equal (nth i exwm-workspace--list) exwm-workspace--current)      
+      (return (exwm-workspace-switch (mod (+ 1 i) (length exwm-workspace--list)))))))
 
 ;; For the love of god, just give me emacs keybindings
 ;; Because otherwise I'm gonna accidentally open new windows every time I want to scroll a bit
@@ -11,7 +16,7 @@
           (lambda ()
             (cond ((and exwm-class-name
                        ;; Firefox
-                        (s-matches? ".*Nightly.*" exwm-class-name))
+                        (s-matches? ".*firefox-default.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
                     '(([?\C-p] . [up])
                       ([?\C-y] . [?\C-v])                 
@@ -106,11 +111,14 @@
 ;; TODO: should allow workspaces, but I need to either fix ace, or better, hack winum mode understand letters instead of numbers(and don't wait for enter to do the thing, christ)
 ;; (setq exwm-workspace-number 4)
 (setq exwm-input-global-keys
-          `(
+      `(
+        ([?\s-q] . (lambda ()
+                     (interactive)
+                          (start-process-shell-command "reset monitor" nil "/home/msteger/bin/fix-monitors")))
             ;; 's-r': Reset (to line-mode).
             ([?\s-r] . exwm-reset)
             ;; 's-w': Switch workspace.
-            ([?\s-w] . exwm-workspace-switch)
+            ([?\s-w] . other-exwm-workspace)
             ([?\s-o] . ace-window)
             ([?\s-f] . exwm-input-toggle-keyboard)
             ;; 's-&': Launch application.
@@ -120,6 +128,7 @@
             ([?\s-p] . multi-vterm-prev)
             ([?\s-n] . multi-vterm-next)
             ([?\s-e] . multi-vterm)
+            ([?\s-u] . vterm)
             ([?\s-i] . pomidor)
             ([?\s-a] . popper-toggle-type)
             ([?\s-s] . popper-toggle-latest)
@@ -133,8 +142,9 @@
             ;;                 (interactive)
             ;;                 (exwm-workspace-switch-create ,i))))
             ;;           (number-sequence 0 9))
-            ;; ([?\s-\(] . (lambda (command)                         
-            ;;              (start-process-shell-command "reset keys" nil "~/bin/unfuck-modmap.sh")))
+            ([?\s-\(] . (lambda ()
+                          (interactive)
+                          (start-process-shell-command "reset keys" nil "~/bin/unfuck-modmap.sh")))
             ([?\M-\[] . winner-undo)
             ([?\M-\]] . winner-redo)
             ))
@@ -142,7 +152,7 @@
 
 
 (require 'exwm-randr)
-(setq exwm-randr-workspace-output-plist '(0 "DP-2-8" 3 "eDP-1"))
+(setq exwm-randr-workspace-output-plist '(0 "HDMI-1" 1 "DP-2-8"))
 (exwm-randr-enable)
 
 (defun main-screen-turn-on()
@@ -155,14 +165,15 @@
             ;; (start-process-shell-command
             ;;  "xrandr" nil "xrandr --output eDP-1 --off --output HDMI-1 --off --output DP-1 --off --output DP-2 --off --output DP-1-8 --primary --mode 3440x1440 --pos 0x0 --rotate normal --output DP-1-1 --off")
             (start-process-shell-command
-             "xrandr" nil "xrandr --output HDMI-1 --off --output DP-1 --off --output DP-2 --off --output DP-1-8 --primary --mode 3440x1440 --pos 0x0 --rotate normal --output DP-1-1 --off")
+             "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --pos 3440x1800 --rotate normal --output HDMI-1 --primary --mode 3440x1440 --pos 0x1440 --rotate normal --output DP-1 --off --output DP-2 --off --output DP-1-8 --mode 3440x1440 --pos 0x0 --rotate inverted --output DP-1-1 --off")
+             ;; "xrandr" nil "xrandr --output HDMI-1 --off --output DP-1 --off --output DP-2 --off --output DP-1-8 --primary --mode 3440x1440 --pos 0x0 --rotate normal --output DP-1-1 --off")
             ))
+
 
 ;; God bless you, daviwil
 (defun daviwil-exwm-input--fake-last-command()
   "Fool some packages into thinking there is a change in the buffer."
-  (setq last-command #'exwm-input--noop)
-  (condition-case hook-error
+  (setq last-command #'exwm-input--noop)  (condition-case hook-error
       (progn
         (run-hooks 'pre-command-hook)
         (run-hooks 'post-command-hook))

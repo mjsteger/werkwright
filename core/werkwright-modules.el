@@ -11,8 +11,11 @@
                              guix
                              terraform
                              lisp
+                             rust
                              editor-tweaks
                              ))
+
+(-concat werkwright-modules werkwright-personal-modules)
 
 (mapc #'require
       (->> werkwright-modules

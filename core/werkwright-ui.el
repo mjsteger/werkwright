@@ -133,8 +133,15 @@
 ;; add some space between lines for easier reading.
 (setq-default line-spacing 1)
 
+(use-package pulsar
+  :config
+  (pulsar-global-mode 1)
+  (setq pulsar-face 'pulsar-magenta)
+  )
+
 ;; highlight the current line
 (global-hl-line-mode t)
+
 
 ;; Add padding inside buffer windows
 (setq-default left-margin-width 2

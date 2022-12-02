@@ -24,13 +24,13 @@
 ;; Following [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom-Emacs FAQ]], we max the garbage collection threshold on startup, and reset it to the original value after.
 
 ;; ;; max memory available for gc on startup
-;; (defvar me/gc-cons-threshold 16777216)
-;; (setq gc-cons-threshold most-positive-fixnum
-;;       gc-cons-percentage 0.6)
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (setq gc-cons-threshold me/gc-cons-threshold
-;;                   gc-cons-percentage 0.1)))
+(defvar me/gc-cons-threshold 16777216)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold me/gc-cons-threshold
+                  gc-cons-percentage 0.1)))
 
 ;; max memory available for gc when opening minibuffer
 (defun me/defer-garbage-collection-h ()
@@ -72,8 +72,6 @@
 ;; Make sude that straight lets you debug on error 
 (setq debug-on-error t)
 
-(setq straight-disable-native-compile t)
-
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -110,9 +108,9 @@
             gcs-done)))
 
 ;; Garbage collector magic hack. Yes really
-(use-package gcmh
-  :demand t
-  :config
-  ;; Set it to 256MB - 1GB means you will get sad when the gc happens
-  (setq gcmh-high-cons-threshold 268435456)
-  (gcmh-mode 1))
+;; (use-package gcmh
+;;   :demand t
+;;   :config
+;;   ;; Set it to 256MB - 1GB means you will get sad when the gc happens
+;;   (setq gcmh-high-cons-threshold 268435456)
+;;   (gcmh-mode 1))

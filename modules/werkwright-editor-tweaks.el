@@ -1,5 +1,6 @@
-(setq popper-groups '())
+(straight-use-package '(keepass :type git :host gitlab :repo "tay-dev/keepass.el"))
 
+(setq popper-groups '())
 
 (defun popper-group-by-steggy ()
   "This function should return a string or symbol that is the
@@ -17,16 +18,38 @@ popup buffer as current, so you can use buffer-local variables."
 
 (defun set-popper-group (&optional arg)
   (interactive "P")
-  (let ((pgroup (ivy-completing-read "What popper group: " popper-groups nil nil)))        
+  (let ((pgroup (ivy-completing-read "What popper group: " popper-groups nil nil)))
     (add-to-list 'popper-groups pgroup)
     (setq-local popper-group-variable pgroup)))
-  
+
 (use-package popper
   :init
   (popper-mode +1)
   (popper-echo-mode +1)
   (setq popper-group-function #'popper-group-by-steggy)
   (setq popper-display-control t)
+  (setq popper-reference-buffers '("\\*Messages\\*$"
+                                   go-test-mode
+                                   (lambda (buf) (with-current-buffer buf
+                                              (and (not (string-equal (buffer-name) "*Org Agenda*"))
+                                                   (not (s-match ".*vterm.*" (buffer-name)))
+                                                        (derived-mode-p 'fundamental-mode)
+                                                   (< (count-lines (point-min) (point-max))
+                                                      10))))
+                                   ))
   )
+
+(use-package whitespace-cleanup-mode
+  :config
+  (global-whitespace-cleanup-mode)
+  )
+
+
+(use-package tree-sitter
+  :config
+  (global-tree-sitter-mode)
+)
+
+(use-package tree-sitter-langs)
 
 (provide 'werkwright-editor-tweaks)

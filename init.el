@@ -2,8 +2,8 @@
   (getenv
    (if (equal system-type 'windows-nt) "USERNAME" "USER")))
 
-(when (version< emacs-version "28.0")
-  (error "[Werkwright] Werkwright requires GNU Emacs 28 or newer, but you're running %s" emacs-version))
+(when (version< emacs-version "29.0")
+  (error "[Werkwright] Werkwright requires GNU Emacs 29 or newer, but you're running %s" emacs-version))
 
 ;; Added this nonsense because I was getting recursive loads from jka-compr
 (setq load-prefer-newer nil)
@@ -23,6 +23,8 @@
 are loaded automatically by Werkwright.")
 (defvar werkwright-personal-preload-dir (expand-file-name "preload" werkwright-personal-dir)
   "This directory is for your personal configuration, that you want loaded before Werkwright.")
+(defvar werkwright-personal-modules '()
+  "Modules you want loaded in werkwright that are personal config, and don't make sense for others.")
 (defvar werkwright-savefile-dir (expand-file-name "savefile" user-emacs-directory)
   "This folder stores all the automatically generated save/history-files.")
 (defvar werkwright-modules-file (expand-file-name "werkwright-modules.el" werkwright-core-dir)
@@ -45,9 +47,9 @@ are loaded automatically by Werkwright.")
 (add-to-list 'load-path werkwright-modules-dir)
 
 ;; reduce the frequency of garbage collection by making it happen on
-;; each 50MB of allocated data (the default is on every 0.76MB)
+;; each 5MB of allocated data (the default is on every 0.76MB)
 ;; NB that this will be the _low_ end for memory - gcmh will set higher on idle
-(setq gc-cons-threshold 50000000)
+(setq gc-cons-threshold 5000000)
 
 ;; warn when opening files bigger than 100MB
 (setq large-file-warning-threshold 100000000)
@@ -83,6 +85,9 @@ are loaded automatically by Werkwright.")
 
 (message "[Werkwright] Loading Werkwright's additional modules...")
 
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
+
 ;; the modules
 (if (file-exists-p werkwright-modules-file)
     (load werkwright-modules-file))
@@ -100,7 +105,7 @@ are loaded automatically by Werkwright.")
 (server-start)
 
 ;; Some quick face customizations at the end
-(set-face-attribute 'default nil :height 150)
+(set-face-attribute 'default nil :height 140)
 (set-face-attribute 'mode-line-inactive nil :background "#353839")
 (set-face-attribute 'minibuffer-prompt nil :foreground "#CDCDCD")
 (set-face-attribute 'ivy-current-match nil :background "#353839")
@@ -117,7 +122,6 @@ are loaded automatically by Werkwright.")
  (vc-mode vc-mode)
  sml/pre-modes-separator mode-line-modes mode-line-misc-info mode-line-end-spaces)
               )
-
 
 
 (provide 'init)

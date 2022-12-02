@@ -12,8 +12,6 @@
     editorconfig
     epl
     expand-region
-    gist
-    git-timemachine
     git-modes
     guru-mode
     hl-todo
@@ -38,6 +36,8 @@
  )
   "A list of packages to ensure are installed at launch.")
 
+; Install things compiled AOT! straight does it natively but in case it's not straight installed
+(setq package-native-compile t)
 (-map (lambda (x) (straight-use-package x)) werkwright-packages)
 (-map (lambda (x) (require x)) werkwright-packages)
 
@@ -139,5 +139,8 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
          (mode (cadr (cdr entry))))
        (werkwright-auto-install extension package mode)))
  werkwright-auto-install-alist)
+
+;; turn on highlighting with tree-sitter all the time
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
 (provide 'werkwright-packages)

@@ -24,7 +24,6 @@
         (goto-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
-(global-set-key (kbd "M-g") 'goto-line-with-feedback)
 (defun authorize-comment ()
   (interactive)
   (insert (concat "steggy: " (format-time-string "%Y-%m-%d:"))))
