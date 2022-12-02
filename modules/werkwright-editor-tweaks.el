@@ -41,7 +41,7 @@ popup buffer as current, so you can use buffer-local variables."
 
 (use-package whitespace-cleanup-mode
   :config
-  (global-whitespace-cleanup-mode)
+  (global-whitespace-cleanup-mode t)
   )
 
 

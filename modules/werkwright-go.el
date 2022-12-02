@@ -4,11 +4,10 @@
 
 (require 'werkwright-lsp)
 (require 'lsp-go)
-(setq company-backends '((company-capf company-yasnippet)))
+
 (use-package company
   :config
-  (push 'company-capf company-backends)
-  (push 'company-yasnippet company-backends)
+  (setq company-backends (-concat '((company-capf company-yasnippet)) company-backends))
   )
 
 (setq flycheck-go-staticcheck-executable "/home/msteger/work/cthulhu/docode/bin/staticcheck")
@@ -43,7 +42,7 @@
                            (local-set-key (kbd "M-.") #'lsp-find-definition)
                            (rainbow-delimiters-mode)
                            (flycheck-select-checker 'go-gofmt)
-                           (add-hook 'before-save-hook 'gofmt-before-save)                           
+                           (add-hook 'before-save-hook 'gofmt-before-save)
                            (setq gofmt-show-errors nil)
                            ;; Because this lags big time on any large codebase
                            (setq lsp-enable-file-watchers nil)))
@@ -78,4 +77,3 @@
   )
 
 (provide 'werkwright-go)
-
