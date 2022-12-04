@@ -7,8 +7,7 @@
   
 
   ;; optionally if you want to use debugger
-  (setq lsp-eldoc-render-all nil)
-  )
+  (setq lsp-eldoc-render-all nil))
 
 ;; Per the dude who wrote lsp - https://github.com/flycheck/flycheck/issues/1762
 (defvar-local my/flycheck-local-cache nil)

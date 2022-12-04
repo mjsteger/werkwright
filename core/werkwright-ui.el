@@ -1,6 +1,7 @@
-(use-package better-defaults)
+(use-package better-defaults
+  :straight (:host github :repo "emacsmirror/better-defaults"))
 
-(setq 
+(setq
       ;; always follow symlinks when opening files
       vc-follow-symlinks t
       ;; overwrite text when selected, like we expect.
@@ -17,7 +18,14 @@
       ;; when quiting emacs, just kill processes
       confirm-kill-processes nil
       ;; ask if local variables are safe once.
-      enable-local-variables t)
+      enable-local-variables t
+
+      display-time-24hr-format t
+      display-time-day-and-date t
+      ;; This gives you second ticking. Turn off if it gets laggy
+      display-time-interval 1
+      display-time-format (concat "%H:%M:%S %d/%m")
+      )
 
 
 ;; use human-readable sizes in dired

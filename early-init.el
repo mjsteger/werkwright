@@ -24,7 +24,7 @@
 ;; Following [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom-Emacs FAQ]], we max the garbage collection threshold on startup, and reset it to the original value after.
 
 ;; ;; max memory available for gc on startup
-(defvar me/gc-cons-threshold 16777216)
+(defvar me/gc-cons-threshold 6400000)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 (add-hook 'emacs-startup-hook
@@ -59,10 +59,9 @@
 ;; Optimizations for improving I/O performance. Increase max bytes read from a sub-process in a single op (Emacs 27+)
 (when (boundp 'read-process-output-max)
   ;; 4MB in bytes, default 4096 bytes
-  (setq read-process-output-max 4194304)
+  (setq read-process-output-max 4194304))
 
 ;; [[https://github.com/raxod502/straight.el][straight.el]] is used to download packages for us from all over the web. It stores them all in their respective git folders in =.emacs.d/straight=, which makes debugging, and contributing fixes back upstream as easy as possible.
-
 (setq straight-use-package-by-default t
       use-package-always-defer t
       straight-cache-autoloads t
@@ -71,7 +70,6 @@
 
 ;; Make sude that straight lets you debug on error 
 (setq debug-on-error t)
-
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -106,11 +104,3 @@
              (float-time
               (time-subtract after-init-time before-init-time)))
             gcs-done)))
-
-;; Garbage collector magic hack. Yes really
-;; (use-package gcmh
-;;   :demand t
-;;   :config
-;;   ;; Set it to 256MB - 1GB means you will get sad when the gc happens
-;;   (setq gcmh-high-cons-threshold 268435456)
-;;   (gcmh-mode 1))

@@ -11,5 +11,5 @@
     (add-hook 'after-init-hook func)
     (when after-init-time
       (eval form))))
-(message "after core")
+
 (provide 'werkwright-core)

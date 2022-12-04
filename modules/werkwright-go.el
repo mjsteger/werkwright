@@ -10,8 +10,7 @@
   (setq company-backends (-concat '((company-capf company-yasnippet)) company-backends))
   )
 
-(setq flycheck-go-staticcheck-executable "/home/msteger/work/cthulhu/docode/bin/staticcheck")
-(setq flycheck-go-errcheck-executable "/home/msteger/work/cthulhu/docode/bin/errcheck")
+
 
 ;; Add buffer local Flycheck checkers after LSP for different major modes.
 (defvar-local my-flycheck-local-cache nil)
@@ -55,8 +54,6 @@
    ("gopls.memoryMode" "DegradeClosed" nil)
    ("gopls.staticcheck" t t)))
 
-(setq flycheck-go-golint-executable "/home/msteger/work/cthulhu/docode/bin/golint")
-(setq lsp-gopls-server-path "/home/msteger/work/cthulhu/docode/bin/gopls")
 
 (setq flycheck-error-list-format `[("Line" 20 flycheck-error-list-entry-< :right-align t)
     ("Col" 10 nil :right-align t)
@@ -65,15 +62,17 @@
     (,(flycheck-error-list-make-last-column "Message" 'Checker) 0 t)])
 
 (use-package gotest
+  :defines popper-reference-buffers
   :init
   ;; If you don't require it first, if it requires in later it will overwrite our binds here
   (require 'go-mode)
-  (add-to-list 'popper-reference-buffers 'go-test-mode)
   :bind (:map go-mode-map
               (("C-c C-c C-f" . go-test-current-file)
                ("C-C C-C C-c" . go-test-current-test)
               ("C-c C-c C-t" . go-test-current-project)
               ))
+  :config
+  (add-to-list 'popper-reference-buffers 'go-test-mode)
   )
 
 (provide 'werkwright-go)

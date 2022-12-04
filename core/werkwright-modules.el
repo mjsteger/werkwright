@@ -15,7 +15,7 @@
                              editor-tweaks
                              ))
 
-(-concat werkwright-modules werkwright-personal-modules)
+(setq werkwright-modules (-concat werkwright-modules werkwright-personal-modules))
 
 (mapc #'require
       (->> werkwright-modules

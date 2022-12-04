@@ -21,26 +21,26 @@
 
 ;; smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
+;; Always turn spaces to tabs if it lines up
+(require 'tabify)
 
-(straight-use-package 'smartparens)
 
 ;; smart pairing for all
-(require 'smartparens-config)
-(setq sp-base-key-bindings 'paredit)
-(setq sp-autoskip-closing-pair 'always)
-(setq sp-hybrid-kill-entire-symbol nil)
-
-(sp-use-paredit-bindings)
-
-(show-smartparens-global-mode +1)
-(smartparens-global-mode +1)
+(use-package smartparens
+  :config
+  (setq sp-base-key-bindings 'paredit)
+  (setq sp-autoskip-closing-pair 'always)
+  (setq sp-hybrid-kill-entire-symbol nil)
+  (require 'smartparens-config)
+  (sp-use-paredit-bindings)
+  (show-smartparens-global-mode +1)
+  (smartparens-global-mode +1))
 
 ;; disable annoying blink-matching-paren
 (setq blink-matching-paren nil)
 
 ;; diminish keeps the modeline tidy
 (use-package diminish)
-(require 'diminish)
 
 ;; meaningful names for buffers with the same name
 (require 'uniquify)
@@ -67,34 +67,32 @@
 (savehist-mode +1)
 
 ;; save recent files
-(require 'recentf)
-(setq recentf-save-file (expand-file-name "recentf" werkwright-savefile-dir)
-      recentf-max-saved-items 500
+(use-package recentf
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" werkwright-savefile-dir)
+      recentf-max-saved-items 1000
       recentf-max-menu-items 15
       ;; disable recentf-cleanup on Emacs start, because it can cause
       ;; problems with remote files
       recentf-auto-cleanup 'never)
-
-(defun werkwright-recentf-exclude-p (file)
-  "A predicate to decide whether to exclude FILE from recentf."
-  (let ((file-dir (file-truename (file-name-directory file))))
-    (cl-some (lambda (dir)
-               (string-prefix-p dir file-dir))
-             (mapcar 'file-truename (list werkwright-savefile-dir package-user-dir)))))
-
-(add-to-list 'recentf-exclude 'werkwright-recentf-exclude-p)
-
-(recentf-mode +1)
+  ;; Don't include dirs in recentf(you can bookmark em if that's what you mean)
+  (defun werkwright-recentf-exclude-p (file)
+    "A predicate to decide whether to exclude FILE from recentf."
+    (let ((file-dir (file-truename (file-name-directory file))))
+      (cl-some (lambda (dir)
+                 (string-prefix-p dir file-dir))
+               (mapcar 'file-truename (list werkwright-savefile-dir package-user-dir)))))
+  (add-to-list 'recentf-exclude 'werkwright-recentf-exclude-p)
+  (recentf-mode +1))
 
 ;; automatically save buffers associated with files on buffer switch
 ;; and on windows switch
-
-(use-package super-save)
-(require 'super-save)
-;; add integration with ace-window
-(add-to-list 'super-save-triggers 'ace-window)
-(super-save-mode +1)
-(diminish 'super-save-mode)
+(use-package super-save
+  :config
+  ;; add integration with ace-window
+  (add-to-list 'super-save-triggers 'ace-window)
+  (super-save-mode +1)
+  (diminish 'super-save-mode))
 
 (defadvice set-buffer-major-mode (after set-major-mode activate compile)
   "Set buffer major mode according to `auto-mode-alist'."
@@ -107,18 +105,21 @@
 ;; highlight the current line
 (global-hl-line-mode +1)
 
-(require 'volatile-highlights)
-(volatile-highlights-mode t)
-(diminish 'volatile-highlights-mode)
+(use-package volatile-highlights
+  :config
+  (volatile-highlights-mode t)
+  (diminish 'volatile-highlights-mode))
 
 ;; tramp, for sudo access
-(require 'tramp)
-(setq tramp-default-method "ssh")
+(use-package tramp
+  :config
+  (setq tramp-default-method "ssh"))
 
 ;; flyspell-mode does spell-checking on the fly as you type
-(require 'flyspell)
-(setq ispell-program-name "aspell" ; use aspell instead of ispell
-      ispell-extra-args '("--sug-mode=ultra"))
+(use-package flyspell
+  :config
+  (setq ispell-program-name "aspell" ; use aspell instead of ispell
+        ispell-extra-args '("--sug-mode=ultra")))
 
 (defcustom werkwright-whitespace t
   "Non-nil values enable Werkwright's whitespace visualization."
@@ -155,54 +156,56 @@
 ;; It's pretty slow and mispellings aren't a big problem for me; not worth it
 ;; (add-hook 'text-mode-hook 'werkwright-enable-flyspell)
 (add-hook 'text-mode-hook 'werkwright-enable-whitespace)
+
 ;; Always make bad whitespace visible
 (global-whitespace-mode)
 
-;; enable narrowing commands
-(put 'narrow-to-region 'disabled nil)
-(put 'narrow-to-page 'disabled nil)
-(put 'narrow-to-defun 'disabled nil)
+;; Don't worry emacs, I know what I'm doing
+;; Enable commands by default
+(--each '(
+          narrow-to-region
+          narrow-to-page
+          narrow-to-defun
+          upcase-region
+          downcase-region
+          erase-buffer
+          ;; dired - reuse current buffer by pressing 'a'
+          dired-find-alternate-file
+          )
+  (put it 'disabled nil)
+  )
 
-;; enabled change region case commands
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+(use-package expand-region)
 
-;; enable erase-buffer command
-(put 'erase-buffer 'disabled nil)
-
-(require 'expand-region)
-
-;; bookmarks
-(require 'bookmark)
-(setq bookmark-default-file (expand-file-name "bookmarks" werkwright-savefile-dir)
-      bookmark-save-flag 1)
+(use-package bookmark
+  :config
+  (setq bookmark-default-file (expand-file-name "bookmarks" werkwright-savefile-dir)
+      bookmark-save-flag 1))
 
 (use-package git-link
   :config
   (global-set-key (kbd "C-c g l") 'git-link))
 
-;; projectile is a project management mode
-(require 'projectile)
-(setq projectile-cache-file (expand-file-name  "projectile.cache" werkwright-savefile-dir))
-(projectile-mode t)
-
-(use-package projectile-ripgrep)
+(use-package projectile
+  :config
+  (setq projectile-cache-file (expand-file-name  "projectile.cache" werkwright-savefile-dir))
+  (projectile-mode t)
+  (use-package projectile-ripgrep))
 
 ;; avy allows us to effectively navigate to visible things
-(require 'avy)
-(setq avy-background t)
-(setq avy-style 'at-full)
+(use-package avy
+  :config
+  (setq avy-background t)
+  (setq avy-style 'at-full))
 
 ;; anzu-mode enhances isearch & query-replace by showing total matches and current match position
-(require 'anzu)
-(diminish 'anzu-mode)
-(global-anzu-mode)
+(use-package anzu
+  :config
+  (diminish 'anzu-mode)
+  (global-anzu-mode)
+  :bind (("M-%" . anzu-query-replace)
+         ("C-M-%" . 'anzu-query-replace-regexp)))
 
-(global-set-key (kbd "M-%") 'anzu-query-replace)
-(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
-
-;; dired - reuse current buffer by pressing 'a'
-(put 'dired-find-alternate-file 'disabled nil)
 
 ;; always delete and copy recursively
 (setq dired-recursive-deletes 'always)
@@ -216,18 +219,19 @@
 (require 'dired-x)
 
 ;; ediff - don't start another frame
-(require 'ediff)
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(use-package ediff
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 ;; clean up obsolete buffers automatically
-(require 'midnight)
+(use-package midnight)
 
 ;; smarter kill-ring navigation
-(use-package browse-kill-ring)
-;; (browse-kill-ring-default-keybindings)
-(global-set-key (kbd "s-y") 'browse-kill-ring)
+(use-package browse-kill-ring
+  :bind (("s-y" . browse-kill-ring))
+  )
 
-(require 'tabify)
+
 (defmacro with-region-or-buffer (func)
   "When called with no active region, call FUNC on current buffer."
   `(defadvice ,func (before with-region-or-buffer activate compile)
@@ -262,19 +266,19 @@ The body of the advice is in BODY."
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 
 ;; whitespace-mode config
-(use-package whitespace)
-(setq whitespace-line-column 80) ;; limit line length
-(setq whitespace-style '(face tabs empty trailing lines-tail))
+(use-package whitespace
+  :config
+  (setq whitespace-line-column 80) ;; limit line length
+  (setq whitespace-style '(face tabs empty trailing lines-tail)))
 
 ;; saner regex syntax
-(require 're-builder)
-(setq reb-re-syntax 'string)
+(use-package re-builder
+  :config
+  (setq reb-re-syntax 'string))
 
-(require 'eshell)
-(setq eshell-directory-name (expand-file-name "eshell" werkwright-savefile-dir))
-
-(setq semanticdb-default-save-directory
-      (expand-file-name "semanticdb" werkwright-savefile-dir))
+(use-package eshell
+  :config
+  (setq eshell-directory-name (expand-file-name "eshell" werkwright-savefile-dir)))
 
 ;; Compilation from Emacs
 (defun werkwright-colorize-compilation-buffer ()
@@ -285,13 +289,14 @@ The body of the advice is in BODY."
     (let ((inhibit-read-only t))
       (ansi-color-apply-on-region (point-min) (point-max)))))
 
-(require 'compile)
-(setq compilation-ask-about-save nil  ; Just save before compiling
-      compilation-always-kill t       ; Just kill old compile processes before
+(use-package compile
+  :config
+  (setq compilation-ask-about-save nil  ; Just save before compiling
+        compilation-always-kill t       ; Just kill old compile processes before
                                         ; starting the new one
-      compilation-scroll-output 'first-error ; Automatically scroll to first
+        compilation-scroll-output 'first-error ; Automatically scroll to first
                                         ; error
-      )
+        ))
 
 ;; Colorize output of Compilation Mode, see
 ;; http://stackoverflow.com/a/3072831/355252
@@ -299,50 +304,40 @@ The body of the advice is in BODY."
 (add-hook 'compilation-filter-hook #'werkwright-colorize-compilation-buffer)
 
 ;; supercharge your undo/redo with undo-tree
-(require 'undo-tree)
-;; autosave the undo-tree history
-(setq undo-tree-history-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq undo-tree-auto-save-history t)
-(global-undo-tree-mode)
-(diminish 'undo-tree-mode)
+(use-package undo-tree
+  :config
+  ;; autosave the undo-tree history
+  (setq undo-tree-history-directory-alist
+        `((".*" . ,temporary-file-directory)))
+  (setq undo-tree-auto-save-history t)
+  (global-undo-tree-mode)
+  (diminish 'undo-tree-mode)
+  ;; Compress history after it gets too big
+  (defadvice undo-tree-make-history-save-file-name
+      (after undo-tree activate)
+    (setq ad-return-value (concat ad-return-value ".gz"))))
 
 ;; enable winner-mode to manage window configurations
 (winner-mode +1)
-(global-set-key (kbd "M-[") 'winner-undo)
-(global-set-key (kbd "M-]") 'winner-redo)
+(keymap-global-set "M-[" 'winner-undo)
+(keymap-global-set "M-]" 'winner-redo)
 
 (use-package rainbow-delimiters
   :config
   (rainbow-delimiters-mode +1)
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
+  :hook (prog-mode . rainbow-delimiters-mode))
 
-;; diff-hl
-(global-diff-hl-mode +1)
-(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+(use-package diff-hl
+  :config
+  (global-diff-hl-mode +1)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
-;; easy-kill
-(global-set-key [remap kill-ring-save] 'easy-kill)
-(global-set-key [remap mark-sexp] 'easy-mark)
+(keymap-global-set "M-w" 'easy-kill)
+(keymap-global-set "C-M-@" 'easy-mark)
 
-;; operate-on-number
-(require 'operate-on-number)
-(require 'smartrep)
-
-(smartrep-define-key global-map "C-c ."
-  '(("+" . apply-operation-to-number-at-point)
-    ("-" . apply-operation-to-number-at-point)
-    ("*" . apply-operation-to-number-at-point)
-    ("/" . apply-operation-to-number-at-point)
-    ("\\" . apply-operation-to-number-at-point)
-    ("^" . apply-operation-to-number-at-point)
-    ("<" . apply-operation-to-number-at-point)
-    (">" . apply-operation-to-number-at-point)
-    ("#" . apply-operation-to-number-at-point)
-    ("%" . apply-operation-to-number-at-point)
-    ("'" . operate-on-number-at-point)))
+;; operate-on-number - invoke while point on number to do a thing
+(use-package operate-on-number)
 
 (defadvice server-visit-files (before parse-numbers-in-lines (files proc &optional nowait) activate)
   "Open file with emacsclient with cursors positioned on requested line.
@@ -363,26 +358,12 @@ and file 'filename' will be opened and cursor set on line 'linenumber'"
                                      (string-to-number (or (match-string 3 name) ""))))
                             fn))) files)))
 
-;; use settings from .editorconfig file when present
-(require 'editorconfig)
-(editorconfig-mode 1)
-(diminish 'editorconfig-mode)
-
-
 (use-package prescient
   :defer 0.1
   :config
-  (prescient-persist-mode 1))
-
-
-(defun swiper-C-r (&optional arg)
-  "Move cursor vertically down ARG candidates.
-If the input is empty, select the previous history element instead."
-  (interactive "p")
-  (if (string= ivy-text "")
-      (ivy-next-history-element 1)
-    (ivy-previous-line arg)))
-
+  (prescient-persist-mode 1)
+  (setq prescient-save-file (expand-file-name "prescient" werkwright-savefile-dir))
+  (setq prescient-aggressive-file-save t))
 
 (use-package ivy
   :diminish
@@ -406,13 +387,19 @@ If the input is empty, select the previous history element instead."
   ;; better matching method
   (ivy-re-builders-alist '((t . ivy--regex-plus)))
   :config
+  (defun swiper-C-r (&optional arg)
+    "Move cursor vertically down ARG candidates.
+If the input is empty, select the previous history element instead."
+    (interactive "p")
+    (if (string= ivy-text "")
+        (ivy-next-history-element 1)
+      (ivy-previous-line arg)))
   (ivy-mode 1)
   (setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
   (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
   (setf (alist-get 'swiper ivy-height-alist) 15)
-  (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7))
-
-(use-package ivy-hydra)
+  (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7)
+  (use-package ivy-hydra))
 
 (use-package counsel
   :defer 0.1
@@ -503,8 +490,7 @@ If the input is empty, select the previous history element instead."
 (use-package transient-posframe
   :config
   (transient-posframe-mode t)
-  (setq transient-posframe-poshandler 'posframe-poshandler-point-window-center)
-  )
+  (setq transient-posframe-poshandler 'posframe-poshandler-point-window-center))
 
 ;; [[https://github.com/lassik/emacs-format-all-the-code][emacs-format-all-the-code]] knows about all the different formatters for different languuages, and tries to run them if they are installed. We configure it to format all modes that are in the ~auto-format-modes~ list on save. We well add modes to this later.
 (defcustom auto-format-modes '()
@@ -529,13 +515,15 @@ If the input is empty, select the previous history element instead."
   :hook (after-change-major-mode . me/maybe-format-all-mode))
 
 (use-package vterm
+  :bind (("M-p" . multi-vterm-prev)
+         ("M-n". multi-vterm-next)
+         :map vterm-mode-map
+         ("M-p" . multi-vterm-prev)
+         ("M-n". multi-vterm-next)
+         ("C-M-/" . vterm-dabbrev-completion))
   :config
   (setq vterm-max-scrollback 100000)
   (setq vterm-timer-delay 0.01)
-  (global-set-key (kbd "M-p") 'multi-vterm-prev)
-  (global-set-key (kbd "M-n") 'multi-vterm-next)
-  (define-key vterm-mode-map (kbd "M-p") 'multi-vterm-prev)
-  (define-key vterm-mode-map (kbd "M-n") 'multi-vterm-next)
   (push '("vterm-copy-mode" vterm-copy-mode) vterm-eval-cmds)
   ;; (push '("recenter-top-bottom" recenter-top-bottom) vterm-eval-cmds)
   ;; (push '("vterm-clear" vterm-clear) vterm-eval-cmds)
@@ -556,30 +544,16 @@ If the input is empty, select the previous history element instead."
           (dabbrev-completion args))
       (dabbrev-completion args)))
 
-  (global-set-key (kbd "C-M-/") #'vterm-dabbrev-completion)
-
-(defun vterm-ivy-completion-in-region-action (orig-fun &rest args)
-  (if (and (equal major-mode 'vterm-mode)
-           (equal in-dabbrev t))
+  (defun vterm-ivy-completion-in-region-action (orig-fun &rest args)
+    (if (and (equal major-mode 'vterm-mode)
+             (equal in-dabbrev t))
         (let ((inhibit-read-only t))
           (dotimes (i (length dabbrev--last-abbreviation))
-                    (vterm-send-backspace))
+            (vterm-send-backspace))
           (vterm-insert (car args)))
       (apply orig-fun args)))
 
-  (advice-add 'ivy-completion-in-region-action :around #'vterm-ivy-completion-in-region-action)
-
-  ;; (defun vterm-counsel-yank-pop-action (orig-fun &rest args)
-  ;;   (if (equal major-mode 'vterm-mode)
-  ;;       (let ((inhibit-read-only t)
-  ;;             (yank-undo-function (lambda (_start _end) (vterm-undo))))
-  ;;         (cl-letf (((symbol-function 'insert-for-yank)
-  ;;                    (lambda (str) (vterm-send-string str t))))
-  ;;           (apply orig-fun args)))
-  ;;     (apply orig-fun args)))
-
-  ;; (advice-add 'counsel-yank-pop-action :around #'vterm-counsel-yank-pop-action)
-  )
+  (advice-add 'ivy-completion-in-region-action :around #'vterm-ivy-completion-in-region-action))
 
 (use-package multi-vterm :ensure t)
 
@@ -594,7 +568,6 @@ If the input is empty, select the previous history element instead."
 (customize-set-variable 'even-window-sizes nil)     ; avoid resizing
 
 ;; [[https://github.com/iqbalansari/restart-emacs][restart-emacs]] teaches Emacs to restart itself. I added a ~me/reload-init~ command as well to just reload the =init.el= file without a full restart.
-
 (defun me/reload-init ()
   "Reload init.el."
   (interactive)
@@ -603,16 +576,7 @@ If the input is empty, select the previous history element instead."
   (message "Reloading init.el... done."))
 
 (use-package restart-emacs
-  :commands restart-emacs
-  )
-
-(setq display-time-24hr-format t)
-(setq display-time-day-and-date t)
-
-;; This gives you second ticking. Turn off if it gets laggy
-(setq display-time-interval 1)
-(setq display-time-format (concat "%H:%M:%S %d/%m"))
-(display-time-mode 1)
+  :commands restart-emacs)
 
 (setq fill-column 80)
 
