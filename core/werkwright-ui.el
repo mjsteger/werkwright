@@ -96,16 +96,6 @@
 (setq fast-but-imprecise-scrolling t
       jit-lock-defer-time 0)
 
-;; [[https://github.com/ahungry/fast-scroll][fast-scroll]] "works by temporarily disabling font-lock and switching to a barebones mode-line, until you stop scrolling (at which point it re-enables)". It only does this when scrolling super fast, to keep everything responsive.
-(use-package fast-scroll
-  :defer 1
-  :hook
-  (fast-scroll-start . (lambda () (flycheck-mode -1)))
-  (fast-scroll-end . (lambda () (flycheck-mode 1)))
-  :config
-  (fast-scroll-config)
-  (fast-scroll-mode 1))
-
 ;; Ligatures
 (use-package ligature
   :straight (:host github :repo "mickeynp/ligature.el")
