@@ -92,7 +92,7 @@ are loaded automatically by Werkwright.")
                (directory-files werkwright-personal-dir 't "^[^#\.].*\\.el$"))))
 
 ;; Man do you want a server for emacsclient
-;; (server-start)
+(server-start)
 
 (provide 'init)
 

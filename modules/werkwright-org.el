@@ -133,12 +133,9 @@
 
 
 (use-package pomidor
-  :config (setq pomidor-sound-tick nil
-                pomidor-sound-tack nil)
-  (push '(:eval (pomidor--format-duration (if (pomidor--break (pomidor--current-state))
-                                              (pomidor--break-duration (pomidor--current-state))
-                                            (pomidor--work-duration (pomidor--current-state))
-                                            ))) (nthcdr 2 mode-line-format)))
+  :custom
+  (pomidor-sound-tick nil)
+  (pomidor-sound-tack nil))
 
 ; (setq org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp))
 (setq org-agenda-window-setup 'current-window)
@@ -161,9 +158,7 @@
                       ("@computer" . ?m)
                       ("@calls" . ?a)
                       ("@anywhere" . ?y)
-                      ("@errand" . ?e)
-
-                      ))
+                      ("@errand" . ?e)))
 
 ;; Shamelessly stolen from https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 (defun my-org-agenda-skip-all-siblings-but-first ()

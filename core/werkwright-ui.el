@@ -165,7 +165,7 @@
 
 (use-package smart-mode-line
   :init
-  (setq sml/theme 'respectful)  
+  (setq sml/theme 'respectful)
   (setq sml/mode-width 1)
   (line-number-mode t)
   (column-number-mode t)

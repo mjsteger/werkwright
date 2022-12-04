@@ -32,7 +32,7 @@
   (setq sp-autoskip-closing-pair 'always)
   (setq sp-hybrid-kill-entire-symbol nil)
   (require 'smartparens-config)
-  (sp-use-paredit-bindings)
+  (sp-use-smartparens-bindings)
   (show-smartparens-global-mode +1)
   (smartparens-global-mode +1))
 
@@ -184,7 +184,7 @@
 
 (use-package git-link
   :config
-  (keymap-global-set "C-c g l" 'git-link))
+  (global-set-key (kbd "C-c g l") 'git-link))
 
 (use-package projectile
   :config
@@ -539,27 +539,7 @@ If the input is empty, select the previous history element instead."
                           ("dired" dired)
                           ("ediff-files" ediff-files)))
 
-  (setq dabbrev-case-fold-search nil)
-
-  ;; Jank that lets you do dabbrev in vterm. Worth it!
-  (defun vterm-dabbrev-completion (&optional args)
-    (interactive "P")
-    (if (equal major-mode 'vterm-mode)
-        (let ((inhibit-read-only t)
-              (in-dabbrev t))
-          (dabbrev-completion args))
-      (dabbrev-completion args)))
-
-  (defun vterm-ivy-completion-in-region-action (orig-fun &rest args)
-    (if (and (equal major-mode 'vterm-mode)
-             (equal in-dabbrev t))
-        (let ((inhibit-read-only t))
-          (dotimes (i (length dabbrev--last-abbreviation))
-            (vterm-send-backspace))
-          (vterm-insert (car args)))
-      (apply orig-fun args)))
-
-  (advice-add 'ivy-completion-in-region-action :around #'vterm-ivy-completion-in-region-action))
+  (setq dabbrev-case-fold-search nil))
 
 (use-package multi-vterm :ensure t)
 
