@@ -62,13 +62,11 @@
   (setq read-process-output-max 4194304))
 
 ;; [[https://github.com/raxod502/straight.el][straight.el]] is used to download packages for us from all over the web. It stores them all in their respective git folders in =.emacs.d/straight=, which makes debugging, and contributing fixes back upstream as easy as possible.
-(setq straight-use-package-by-default t
-      use-package-always-defer t
+(setq straight-use-package-by-default t      
       straight-cache-autoloads t
-      straight-vc-git-default-clone-depth 1
-      vc-follow-symlinks t)
+      straight-vc-git-default-clone-depth 1)
 
-;; Make sude that straight lets you debug on error 
+;; Make sude that straight lets you debug on error
 (setq debug-on-error t)
 
 (defvar bootstrap-version)

@@ -12,10 +12,6 @@
 (use-package counsel-projectile
   :after projectile
   :init
-  (counsel-projectile-mode 1)  
-  )
-
-;; For some reason need to do it twice
-;; (counsel-projectile-mode 1)
+  (counsel-projectile-mode 1))
 
 (provide 'werkwright-projectile)

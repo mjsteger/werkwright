@@ -1,9 +1,6 @@
-
 (use-package magit
   :ensure t
   :bind ("C-c g" . magit-status)
-  :custom
-  (magit-git-executable "/usr/bin/git")
   :init
   (use-package with-editor :ensure t)
 

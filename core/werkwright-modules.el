@@ -4,12 +4,10 @@
                              ace
                              go
                              efuncs
-                             org
                              themes
-                             exwm
                              smudge
-                             guix
                              terraform
+                             magit
                              lisp
                              rust
                              editor-tweaks

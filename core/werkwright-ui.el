@@ -125,22 +125,17 @@
   :config
   (solaire-global-mode +1))
 
-;; add some space between lines for easier reading.
-(setq-default line-spacing 1)
-
-(use-package pulsar
+(use-package pulsar  
   :config
   (pulsar-global-mode 1)
-  (setq pulsar-face 'pulsar-magenta)
-  )
+  (setq pulsar-face 'pulsar-magenta))
 
 ;; highlight the current line
 (global-hl-line-mode t)
 
-
 ;; Add padding inside buffer windows
-(setq-default left-margin-width 2
-              right-margin-width 2)
+(setq-default left-margin-width 1
+              right-margin-width 1)
 (set-window-buffer nil (current-buffer)) ; Use them now.
 
 ;; Add padding inside frames (windows)
@@ -168,29 +163,25 @@
 (use-package vivid-theme
   :straight (:host github :repo "websymphony/vivid-theme"))
 
-
 (use-package smart-mode-line
   :init
-  (setq sml/theme 'respectful)
+  (setq sml/theme 'respectful)  
   (setq sml/mode-width 1)
   (line-number-mode t)
   (column-number-mode t)
   (display-battery-mode +1)
-  (setq sml/show-time nil)
-  (setq sml/position-percentage-format nil)  
+  (setq sml/position-percentage-format nil)
   (setq rm-whitelist ".*lsp.*")
   (setq display-time-default-load-average nil)
+  (display-time-mode 1)
   (smart-mode-line-enable)
-  (sml/apply-theme 'respectful)
-  )
-
-;; enable y/n 
-(fset 'yes-or-no-p 'y-or-n-p)
+  (sml/apply-theme 'respectful))
 
 ;; more useful frame title, that show either a file or a
 ;; buffer name (if the buffer isn't visiting a file)
 (setq frame-title-format
       '("" invocation-name " Werkwright - " (:eval (if (buffer-file-name)
                                             (abbreviate-file-name (buffer-file-name))
-                                          "%b"))))
+                                            "%b"))))
+
 (provide 'werkwright-ui)

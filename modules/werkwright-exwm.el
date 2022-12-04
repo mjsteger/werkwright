@@ -2,12 +2,10 @@
   :config
   (require 'exwm-edit))
 
-(require 'exwm-edit)
-
 (defun other-exwm-workspace()
   (interactive)
   (dotimes (i (length exwm-workspace--list))
-    (when (equal (nth i exwm-workspace--list) exwm-workspace--current)      
+    (when (equal (nth i exwm-workspace--list) exwm-workspace--current)
       (return (exwm-workspace-switch (mod (+ 1 i) (length exwm-workspace--list)))))))
 
 ;; For the love of god, just give me emacs keybindings
@@ -19,7 +17,7 @@
                         (s-matches? ".*firefox-default.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
                     '(([?\C-p] . [up])
-                      ([?\C-y] . [?\C-v])                 
+                      ([?\C-y] . [?\C-v])
                       ([?\C-n] . [down])
                       ([?\C-a] . [home])
                       ([?\C-w] . [C-backspace])
@@ -40,7 +38,7 @@
                         (s-matches? ".*Nightly:Meet.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
                     '(([?\C-p] . [up])
-                      ([?\C-y] . [?\C-v])                 
+                      ([?\C-y] . [?\C-v])
                       ([?\C-n] . [down])
                       ([?\C-a] . [home])
                       ([?\C-w] . [C-backspace])
@@ -59,20 +57,20 @@
                   ((and exwm-class-name
                        ;; Slack
                         (s-matches? ".*Slack:Slack.*" exwm-class-name))
-                   (exwm-input-set-local-simulation-keys                    
-                     (list (cons 
+                   (exwm-input-set-local-simulation-keys
+                     (list (cons
                             (vconcat (listify-key-sequence (kbd "C-x h")))
                             (vconcat (listify-key-sequence (kbd "C-a")))
                             )
-                           (cons 
+                           (cons
                             (vconcat (listify-key-sequence (kbd "C-w")))
                             (vconcat (listify-key-sequence (kbd "<backspace>")))
                             )
-                           (cons 
+                           (cons
                             (vconcat (listify-key-sequence (kbd "C-y")))
                             (vconcat (listify-key-sequence (kbd "C-v")))
                             )
-                           ) 
+                           )
                      )
                     )
                    ))
@@ -81,7 +79,7 @@
  ;;            (s-matches? ".*Nightly.*" exwm-class-name))
             ;;   (exwm-input-set-local-simulation-keys
             ;;    '(([?\C-p] . [up])
-            ;;      ([?\C-y] . [?\C-v])                 
+            ;;      ([?\C-y] . [?\C-v])
             ;;      ([?\C-n] . [down])
             ;;      ([?\C-a] . [home])
             ;;      ([?\C-w] . [C-backspace])
@@ -94,7 +92,7 @@
             ;;      ([?\C-k] . [S-end ?\C-c delete]))
             ;;    ))
             )
-                 
+
 (defun exwm-rename-buffer ()
   (interactive)
   (exwm-workspace-rename-buffer
@@ -109,12 +107,15 @@
 ;; TODO:
 ;; Should update to allow C-d to go through on meet if the exwm-title changes to Meet something
 ;; TODO: should allow workspaces, but I need to either fix ace, or better, hack winum mode understand letters instead of numbers(and don't wait for enter to do the thing, christ)
-;; (setq exwm-workspace-number 4)
+(setq exwm-workspace-number 2)
 (setq exwm-input-global-keys
       `(
         ([?\s-q] . (lambda ()
                      (interactive)
-                          (start-process-shell-command "reset monitor" nil "/home/msteger/bin/fix-monitors")))
+                     (start-process-shell-command "reset monitor" nil "/home/msteger/bin/fix-monitors")))
+        ([?\s-*] . (lambda ()
+                     (interactive)
+                          (start-process-shell-command "fix brightness on top monitor" nil "/home/msteger/bin/fix-brightness")))
             ;; 's-r': Reset (to line-mode).
             ([?\s-r] . exwm-reset)
             ;; 's-w': Switch workspace.
@@ -152,7 +153,9 @@
 
 
 (require 'exwm-randr)
+
 (setq exwm-randr-workspace-output-plist '(0 "HDMI-1" 1 "DP-2-8"))
+
 (exwm-randr-enable)
 
 (defun main-screen-turn-on()

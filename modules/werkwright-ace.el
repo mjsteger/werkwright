@@ -1,8 +1,7 @@
 (use-package ace-window
   :config
   (setq aw-keys '(?a ?s ?h ?t ?n ?e ?o ?i ?9))
-  (global-set-key (kbd "M-o") 'ace-window)
-  
+  (keymap-global-set "M-o" 'ace-window)
   (setq aw-dispatch-alist
     '((?x aw-delete-window "Delete Window")
       (?m aw-swap-window "Swap Windows")
@@ -18,7 +17,6 @@
       (?O delete-other-windows "Delete Other Windows")
       (?T aw-transpose-frame "Transpose Frame")
       ;; ?i ?r ?t are used by hyperbole.el
-      (?? aw-show-dispatch-help)))    
-  )
+      (?? aw-show-dispatch-help))))
 
 (provide 'werkwright-ace)

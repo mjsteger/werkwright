@@ -4,4 +4,4 @@ Naming comes from combing old english words for ways to describe a toolmaker, an
 
 Steals a lot from Prelude in overall structure, and lots of other stealing everywhere else
 
-To install: Copy the early-init.el to e.g. ~/.emacs.d/ . You don't want to symbolic link it, since emacs will ask to follow it. You could have an early-early init and do (setq vc-follow-symlinks t) if you really hate this; I just didn't think it made sense.
+To install: symlink early-init.el like `ln -s ~/path/to/werkwright/early-init.el ~/.emacs.d/earlyish-init.el`, and then copy early-loader.el into e.g. ~/.emacs.d/early-init.el

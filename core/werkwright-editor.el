@@ -184,7 +184,7 @@
 
 (use-package git-link
   :config
-  (global-set-key (kbd "C-c g l") 'git-link))
+  (keymap-global-set "C-c g l" 'git-link))
 
 (use-package projectile
   :config
@@ -288,6 +288,8 @@ The body of the advice is in BODY."
   (when (eq major-mode 'compilation-mode)
     (let ((inhibit-read-only t))
       (ansi-color-apply-on-region (point-min) (point-max)))))
+
+(fset 'yes-or-no-p 'y-or-n-p)
 
 (use-package compile
   :config
@@ -395,6 +397,7 @@ If the input is empty, select the previous history element instead."
         (ivy-next-history-element 1)
       (ivy-previous-line arg)))
   (ivy-mode 1)
+  (ido-mode -1)
   (setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
   (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
   (setf (alist-get 'swiper ivy-height-alist) 15)
@@ -515,12 +518,15 @@ If the input is empty, select the previous history element instead."
   :hook (after-change-major-mode . me/maybe-format-all-mode))
 
 (use-package vterm
+  :init
+  (setq vterm-always-compile-module t)
   :bind (("M-p" . multi-vterm-prev)
          ("M-n". multi-vterm-next)
          :map vterm-mode-map
          ("M-p" . multi-vterm-prev)
          ("M-n". multi-vterm-next)
          ("C-M-/" . vterm-dabbrev-completion))
+  :defer t
   :config
   (setq vterm-max-scrollback 100000)
   (setq vterm-timer-delay 0.01)

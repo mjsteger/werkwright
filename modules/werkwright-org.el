@@ -1,18 +1,15 @@
 (use-package org
   :hook (org-mode . ms/org-mode-setup)
   :config
+  (defun ms/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (auto-fill-mode 0)
+    (visual-line-mode 1))
   (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t))
 
-(defun ms/org-mode-setup ()
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-  (auto-fill-mode 0)
-  (visual-line-mode 1)  
-  )
-
 ;; Org stuff shamelessly stolen from https://systemcrafters.net/emacs-from-scratch/org-mode-basics/
-
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode)
@@ -56,8 +53,7 @@
   (concat home common-notes-prefix name ".org"))
 
 (defun add-org-name-to-agenda (name func)
-  (add-to-list 'org-agenda-files (apply func name nil))
-  )
+  (add-to-list 'org-agenda-files (apply func name nil)))
 
 (defun make-org-agenda-name (name)
   (concat home common-notes-prefix "agenda/" name ".org"))
@@ -106,7 +102,7 @@
                                     ("e" "Errands" entry (file "~/national/gtd/errands.org")
                                      "** TODO %?\n  %i Filed on: %U\n")
                                     ("C" "At computer" entry (file "~/national/gtd/at_computer.org")
-                                     "** TODO %?\n  %i Filed on: %U\n")                                 
+                                     "** TODO %?\n  %i Filed on: %U\n")
                                     ("s" "Someday/Maybe" entry (file "~/national/gtd/someday-maybe.org")
                                      "** %?\n %i Filed on: %U\n")
                                     ("r" "Read-review" entry (file "~/national/gtd/read-review.org")
@@ -114,8 +110,7 @@
                                     ("S" "Standup" entry (file "~/national/gtd/agenda/standup.org")
                                      "** Scheduled %?\n  %i Filed on: %U\n")
                                     ("E" "Emotion Tracking" entry (file "~/national/gtd/emotion_tracking.org")
-                                     "* %U\n** What are you feeling? Where are you feeling it?[[https://humansystems.co/emotionwheels/][See this]]%?\n** What Happened?\n** What was the situation/trigger?\n** What did you feel?\n** How did you react?\n** What were the consequences(good/bad) of that reaction?"))
-                                    ))
+                                     "* %U\n** What are you feeling? Where are you feeling it?[[https://humansystems.co/emotionwheels/][See this]]%?\n** What Happened?\n** What was the situation/trigger?\n** What did you feel?\n** How did you react?\n** What were the consequences(good/bad) of that reaction?"))))
 
 (setq org-agenda-skip-scheduled-if-done t)
 
@@ -127,33 +122,23 @@
 
 
 (use-package org-jira)
-(setq jiralib-url "https://jira.internal.digitalocean.com")
 (setq org-agenda-skip-additional-timestamps-same-entry t)
 
 (use-package org-pomodoro
   :after org
   :config
-  (setq org-pomodoro-keep-killed-pomodoro-time t)  
-  )
-
-(setq-default mode-line-format (add-to-ordered-list 'mode-line-format '(:eval (pomidor--format-duration (if (pomidor--break (pomidor--current-state))
-                                                                                                                                                                                         (pomidor--break-duration (pomidor--current-state))
-                                                                                                                                                                                       (pomidor--work-duration (pomidor--current-state))
-                                                                                                                                                                                       
-                                                                                                                                                                                       ))
-                                              ) 4))
+  (setq org-pomodoro-keep-killed-pomodoro-time t))
 
 
-(use-package pomidor  
+
+
+(use-package pomidor
   :config (setq pomidor-sound-tick nil
                 pomidor-sound-tack nil)
   (push '(:eval (pomidor--format-duration (if (pomidor--break (pomidor--current-state))
                                               (pomidor--break-duration (pomidor--current-state))
                                             (pomidor--work-duration (pomidor--current-state))
-                                            
-                                            ))
-                ) (nthcdr 3 mode-line-format))
-  )
+                                            ))) (nthcdr 2 mode-line-format)))
 
 ; (setq org-agenda-entry-types '(:deadline :scheduled :timestamp :sexp))
 (setq org-agenda-window-setup 'current-window)
@@ -177,7 +162,7 @@
                       ("@calls" . ?a)
                       ("@anywhere" . ?y)
                       ("@errand" . ?e)
-                      
+
                       ))
 
 ;; Shamelessly stolen from https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
@@ -193,11 +178,11 @@
     (when should-skip-entry
       (or (outline-next-heading)
           (goto-char (point-max))))))
-		  
+
 (defun org-current-is-todo ()
   (string= "TODO" (org-get-todo-state)))
 
-(setq org-agenda-custom-commands 
+(setq org-agenda-custom-commands
       '(("o" "Work related stuff" tags-todo "@work"
          ((org-agenda-overriding-header "Work")
           (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))

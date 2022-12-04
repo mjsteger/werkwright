@@ -1,4 +1,5 @@
-(straight-use-package '(keepass :type git :host gitlab :repo "tay-dev/keepass.el"))
+(use-package keepass
+  :straight (:host gitlab :repo "tay-dev/keepass.el"))
 
 (use-package popper
   :init
@@ -48,9 +49,12 @@ popup buffer as current, so you can use buffer-local variables."
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   (use-package tree-sitter-langs))
 
+;; Do the envrc thing for emacs buffers
 (use-package envrc
   :init
-  (envrc-global-mode)
-  )
+  (envrc-global-mode))
+
+;; gimme subword navigation
+(global-subword-mode 1)
 
 (provide 'werkwright-editor-tweaks)

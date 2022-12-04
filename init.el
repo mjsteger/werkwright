@@ -57,7 +57,7 @@ are loaded automatically by Werkwright.")
 (message "[Werkwright] Loading Werkwright's core modules...")
 
 ;; Include these so I can use fancy mapping in core stuff
-(use-package dash :demand t)
+(use-package dash)
 (use-package s)
 
 (--each '(
