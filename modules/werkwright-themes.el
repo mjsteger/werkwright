@@ -11,5 +11,10 @@
 
 (set-face-attribute 'mode-line-inactive nil :background "#323232")
 
-(load-theme 'doom-one t)
+;; Need to do this or you can't see whitespace
+(set-face-attribute 'whitespace-tab nil :background "#2c2f3a")
+(set-face-attribute 'whitespace-space nil :background "#2c2f3a")
+
+(load-theme 'doom-vibrant t)
+
 (provide 'werkwright-themes)
