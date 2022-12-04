@@ -24,8 +24,7 @@
       display-time-day-and-date t
       ;; This gives you second ticking. Turn off if it gets laggy
       display-time-interval 1
-      display-time-format (concat "%H:%M:%S %d/%m")
-      )
+      display-time-format (concat "%H:%M:%S %d/%m"))
 
 
 ;; use human-readable sizes in dired
@@ -38,7 +37,6 @@
 (global-font-lock-mode 1)
 
 ;; Emacs is very conservative about assuming encoding. Everything is utf-8 these days, lets have that as the default.
-
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
@@ -57,9 +55,7 @@
   (when (file-exists-p custom-file)
     (load custom-file)))
 
-
 ;; [[https://github.com/justbur/emacs-which-key][which-key]] pops up a nice window whenever we hesitate about a keyboard shortcut, and shows all the possible keys we can press. Popularized by Spacemacs and Doom-Emacs, we can now configure absurd key combinations, forget about them, and then be delighted to discover them again!
-
 (use-package which-key
   :demand t
   :custom
@@ -71,29 +67,30 @@
   (set-face-attribute
     'which-key-local-map-description-face nil :weight 'bold))
 
-
-;; (setq ring-bell-function 'ignore ; no bell
-;;       ;; better scrolling
-;;       scroll-step 1
-;;       scroll-conservatively 101
-;;       scroll-preserve-screen-position 1
-;;       mouse-wheel-scroll-amount '(1 ((shift) . 5))
-;;       mouse-wheel-follow-mouse t
-;;       ;; lines between the cursor and the edge of the screen
-;;       scroll-margin 3
-
-;;       ;; wrap lines that are too long.
-;;       truncate-lines nil
-;;       ;; don't resize frames a character at a time, but use pixels
-;;       frame-resize-pixelwise t)
-
-
-
+;; display how many matches for search you have in buffer 
 (use-package anzu
   :defer 1
   :after isearch
   :config
   (global-anzu-mode 1))
+
+;; as you might imagine - highlight todos
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode))
+
+; Better(faster) line numbering
+(use-package nlinum
+  :config
+  (global-nlinum-mode))
+
+;; make e.g. #FF0000 the color it represents!
+(use-package rainbow-mode
+  :config
+  (define-globalized-minor-mode my-global-rainbow-mode rainbow-mode
+    (lambda () (rainbow-mode 1)))
+
+  (my-global-rainbow-mode 1))
 
 ;; Always redraw immediately when scrolling, more responsive and doesn't hang! Sourced from http://emacs.stackexchange.com/a/31427/2418
 (setq fast-but-imprecise-scrolling t

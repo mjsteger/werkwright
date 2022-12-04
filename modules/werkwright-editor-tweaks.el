@@ -40,16 +40,13 @@ popup buffer as current, so you can use buffer-local variables."
 
 (use-package whitespace-cleanup-mode
   :config
-  (global-whitespace-cleanup-mode t)
-  )
-
+  (global-whitespace-cleanup-mode t))
 
 (use-package tree-sitter
   :config
   (global-tree-sitter-mode)
-)
-
-(use-package tree-sitter-langs)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  (use-package tree-sitter-langs))
 
 (use-package envrc
   :init

@@ -1,38 +1,18 @@
 (defvar werkwright-packages
-  '(ace-window
-    ag
-    anzu
-    avy
+  '(ag
     browse-kill-ring
     crux
     discover-my-major
-    diff-hl
-    diminish
     easy-kill
-    editorconfig
     epl
-    expand-region
     git-modes
     guru-mode
-    hl-todo
-    imenu-anywhere
     projectile
-    magit
-    move-text
-    nlinum
-    operate-on-number
-    smartparens
-    smartrep
-    super-save
-    undo-tree
-    volatile-highlights
-    which-key
     zenburn-theme
     zop-to-char
-  ace-jump-mode
-  dash
-  elisp-slime-nav
-  rainbow-mode
+    ace-jump-mode
+    elisp-slime-nav
+    rainbow-mode
  )
   "A list of packages to ensure are installed at launch.")
 
@@ -40,11 +20,6 @@
 (setq package-native-compile t)
 (-map (lambda (x) (straight-use-package x)) werkwright-packages)
 (-map (lambda (x) (require x)) werkwright-packages)
-
-;; (define-globalized-minor-mode my-global-rainbow-mode rainbow-mode
-;;   (lambda () (rainbow-mode 1)))
-
-;; (my-global-rainbow-mode 1)
 
 ;; remove with e.g. (remhash "smart-mode-line" straight--repo-cache)
 
@@ -118,18 +93,9 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
 ;; Need to add these proper like
 ;; ;; markdown-mode doesn't have autoloads for the auto-mode-alist
 ;; ;; so we add them manually if it's already installed
-;; (when (package-installed-p 'markdown-mode)
-;;   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . gfm-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode)))
-
-;; ;; same with adoc-mode
-;; (when (package-installed-p 'adoc-mode)
-;;   (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.asciidoc\\'" . adoc-mode)))
-
-;; ;; and pkgbuild-mode
-;; (when (package-installed-p 'pkgbuild-mode)
-;;   (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . pkgbuild-mode)))
+(when (package-installed-p 'markdown-mode)
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . gfm-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode)))
 
 ;; build auto-install mappings
 (mapc
@@ -139,8 +105,5 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
          (mode (cadr (cdr entry))))
        (werkwright-auto-install extension package mode)))
  werkwright-auto-install-alist)
-
-;; turn on highlighting with tree-sitter all the time
-(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
 (provide 'werkwright-packages)
