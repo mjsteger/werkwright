@@ -24,7 +24,7 @@
 ;; Following [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom-Emacs FAQ]], we max the garbage collection threshold on startup, and reset it to the original value after.
 
 ;; ;; max memory available for gc on startup
-(defvar me/gc-cons-threshold 6400000)
+(defvar me/gc-cons-threshold 12800000)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 (add-hook 'emacs-startup-hook
