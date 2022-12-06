@@ -67,7 +67,7 @@
   (set-face-attribute
     'which-key-local-map-description-face nil :weight 'bold))
 
-;; display how many matches for search you have in buffer 
+;; display how many matches for search you have in buffer
 (use-package anzu
   :defer 1
   :after isearch
@@ -81,15 +81,15 @@
 
 ; Better(faster) line numbering
 (use-package nlinum
-  :config
-  (global-nlinum-mode))
+  :hook
+  (prog-mode . nlinum-mode))
 
 ;; make e.g. #FF0000 the color it represents!
 (use-package rainbow-mode
   :config
   (define-globalized-minor-mode my-global-rainbow-mode rainbow-mode
-    (lambda () (rainbow-mode 1)))
-
+    (lambda () (unless (derived-mode-p 'org-agenda-mode)
+             (rainbow-mode 1))))
   (my-global-rainbow-mode 1))
 
 ;; Always redraw immediately when scrolling, more responsive and doesn't hang! Sourced from http://emacs.stackexchange.com/a/31427/2418
@@ -125,7 +125,7 @@
   :config
   (solaire-global-mode +1))
 
-(use-package pulsar  
+(use-package pulsar
   :config
   (pulsar-global-mode 1)
   (setq pulsar-face 'pulsar-magenta))
@@ -160,8 +160,6 @@
 
 ;; disable startup screen
 (setq inhibit-startup-screen t)
-(use-package vivid-theme
-  :straight (:host github :repo "websymphony/vivid-theme"))
 
 (use-package smart-mode-line
   :init
@@ -175,6 +173,7 @@
   (setq display-time-default-load-average nil)
   (display-time-mode 1)
   (smart-mode-line-enable)
+  (set-face-attribute 'mode-line nil :inherit 'variable-pitch)
   (sml/apply-theme 'respectful))
 
 ;; more useful frame title, that show either a file or a

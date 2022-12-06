@@ -184,7 +184,7 @@
 
 (use-package git-link
   :config
-  (global-set-key (kbd "C-c g l") 'git-link))
+  (global-set-key (kbd "C-c h l") 'git-link))
 
 (use-package projectile
   :config
@@ -268,8 +268,8 @@ The body of the advice is in BODY."
 ;; whitespace-mode config
 (use-package whitespace
   :config
-  (setq whitespace-line-column 80) ;; limit line length
-  (setq whitespace-style '(face tabs empty trailing lines-tail)))
+  (setq whitespace-line-column 160) ;; limit line length
+  (setq whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab tab-mark missing-newline-at-eof)))
 
 ;; saner regex syntax
 (use-package re-builder
@@ -524,8 +524,7 @@ If the input is empty, select the previous history element instead."
          ("M-n". multi-vterm-next)
          :map vterm-mode-map
          ("M-p" . multi-vterm-prev)
-         ("M-n". multi-vterm-next)
-         ("C-M-/" . vterm-dabbrev-completion))
+         ("M-n". multi-vterm-next))
   :defer t
   :config
   (setq vterm-max-scrollback 100000)

@@ -51,7 +51,9 @@
               ("C-c C-c C-t" . go-test-current-project)
               ))
   :config
-  (add-to-list 'popper-reference-buffers 'go-test-mode)
-  )
+  (add-to-list 'popper-reference-buffers 'go-test-mode))
+
+(use-package go-playground)
+
 
 (provide 'werkwright-go)
