@@ -1,5 +1,6 @@
 (use-package magit
-  :ensure t
+  :custom
+  (magit-commit-show-diff . nil)
   :bind ("C-c g" . magit-status)
   :init
   (use-package with-editor :ensure t)
