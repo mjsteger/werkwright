@@ -5,7 +5,7 @@
       ;; always follow symlinks when opening files
       vc-follow-symlinks t
       ;; overwrite text when selected, like we expect.
-      delete-seleciton-mode t
+      delete-selection-mode t
       ;; quiet startup
       inhibit-startup-message t
       initial-scratch-message nil
