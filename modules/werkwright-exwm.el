@@ -8,11 +8,72 @@
     (when (equal (nth i exwm-workspace--list) exwm-workspace--current)
       (return (exwm-workspace-switch (mod (+ 1 i) (length exwm-workspace--list)))))))
 
+(use-package hydra
+  :config
+  (defun get-buffer-by-name (name)
+    (-first (lambda (buf) (s-match name (buffer-name buf))) (buffer-list)))
+
+  (defun switch-to-buffer-named (name)
+    (exwm-workspace-switch-to-buffer (get-buffer-by-name name)))
+
+  (defun unfuck-modmap ()
+    (interactive)
+    (start-process-shell-command "reset keys" nil "~/bin/unfuck-modmap.sh"))
+
+  (defhydra "exwm-buffers" ()
+    "common buffers"
+    ("f" (lambda () (interactive) (switch-to-buffer-named "firefox-default:")) :exit t)
+    ("s" (lambda () (interactive) (switch-to-buffer-named "Slack:")) :exit t)
+    ("c" (lambda () (interactive) (switch-to-buffer-named "*scratch*")) :exit t)
+    ("g" (lambda () (interactive) (switch-to-buffer-named "groundcontrol")) :exit t))
+
+  (defhydra "exwm-control" (global-map "C-c")
+    "exwm"
+    ("w" other-exwm-workspace "go to other workspace" :exit t)
+    ("o" ace-window "ace around" :exit t)
+    ("C-x c" (lambda () (interactive) (start-process-shell-command "go to other screen" nil "/home/msteger/bin/send_monitors")))
+    ("i" pomidor "pomidor")
+    ("u" vterm "vterming" :exit t)
+    ("d" popper-toggle-type "toggle popper type" :exit t)
+    ("s" popper-toggle-latest "toggle latest popper" :exit t)
+    ("h" popper-cycle "cycle popper" :exit t)
+    ("t" popper-kill-latest-popup "kill last popper popup" :exit t)
+    ("." smudge-command-map :exit t)
+    ("n" multi-vterm-next "next vterm")
+    ("y" multi-vterm-prev "prev vterm")
+    ("e" multi-vterm "make a new multi vterm" :exit t)
+    ("9" unfuck-modmap "unfuck modmap" :exit t)
+    ("[" winner-undo "winner undo")
+    ("]" winner-redo "winner redo")
+    ("b" \"exwm-buffers\"/body :exit t)
+    ))
+
 ;; For the love of god, just give me emacs keybindings
 ;; Because otherwise I'm gonna accidentally open new windows every time I want to scroll a bit
 (add-hook 'exwm-manage-finish-hook
           (lambda ()
-            (cond ((and exwm-class-name
+            (cond
+             ((and exwm-class-name
+                       ;; Firefox
+                        (s-matches? ".*firefox-default:Meet -.*" exwm-class-name))
+                   (exwm-input-set-local-simulation-keys
+                    '(([?\C-p] . [up])
+                      ([?\C-y] . [?\C-v])
+                      ([?\C-n] . [down])
+                      ([?\C-a] . [home])
+                      ([?\C-w] . [C-backspace])
+                      ([?\C-s] . [C-f C-g])
+                      ([?\C-r] . [C-S-g])
+                      ([?\C-f] . [C-tab])
+                      ([?\C-b] . [C-S-tab])
+                      ([?\C-e] . [end])
+                      ([?\C-k] . [C-w])
+                      ([?\C-d] . [delete])
+                      ([?\C-k] . [S-end ?\C-c delete])
+                      ([?\C-x ?h] . [?\C-a])
+                      ([?\h] . [?\C-d])
+                      )))
+             ((and exwm-class-name
                        ;; Firefox
                         (s-matches? ".*firefox-default.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
@@ -30,50 +91,25 @@
                       ([?\C-d] . [delete])
                       ([?\C-k] . [S-end ?\C-c delete])
                       ([?\C-x ?h] . [?\C-a])
-                      )
-                    )
-                   )
-                  ((and exwm-class-name
-                       ;; Firefox
-                        (s-matches? ".*Nightly:Meet.*" exwm-class-name))
-                   (exwm-input-set-local-simulation-keys
-                    '(([?\C-p] . [up])
-                      ([?\C-y] . [?\C-v])
-                      ([?\C-n] . [down])
-                      ([?\C-a] . [home])
-                      ([?\C-w] . [C-backspace])
-                      ([?\C-s] . [C-f C-g])
-                      ([?\C-r] . [C-S-g])
-                      ([?\C-f] . [C-tab])
-                      ([?\C-b] . [C-S-tab])
-                      ([?\C-e] . [end])
-                      ([x] . [up])
-                      ([?\C-d] . [delete])
-                      ([?\C-k] . [S-end ?\C-c delete])
-                      ([?\C-x ?h] . [?\C-a])
-                      )
-                    )
-                   )
+                      ([?\h] . [?\C-d])
+                      )))
                   ((and exwm-class-name
                        ;; Slack
-                        (s-matches? ".*Slack:Slack.*" exwm-class-name))
+                        (s-matches? ".*Slack:.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
-                     (list (cons
-                            (vconcat (listify-key-sequence (kbd "C-x h")))
-                            (vconcat (listify-key-sequence (kbd "C-a")))
-                            )
-                           (cons
-                            (vconcat (listify-key-sequence (kbd "C-w")))
-                            (vconcat (listify-key-sequence (kbd "<backspace>")))
-                            )
-                           (cons
-                            (vconcat (listify-key-sequence (kbd "C-y")))
-                            (vconcat (listify-key-sequence (kbd "C-v")))
-                            )
-                           )
+                    (list
+                     (cons [?\C-*] [?\s])
+                     (cons
+                      (vconcat (listify-key-sequence (kbd "C-x h")))
+                      (vconcat (listify-key-sequence (kbd "C-a"))))
+                     (cons
+                      (vconcat (listify-key-sequence (kbd "C-w")))
+                      (vconcat (listify-key-sequence (kbd "<backspace>"))))
+                     (cons
+                      (vconcat (listify-key-sequence (kbd "C-y")))
+                      (vconcat (listify-key-sequence (kbd "C-v"))))
                      )
-                    )
-                   ))
+                    ))))
             ;; (when (and exwm-class-name
             ;;            ;; Firefox
  ;;            (s-matches? ".*Nightly.*" exwm-class-name))
@@ -120,7 +156,9 @@
             ([?\s-r] . exwm-reset)
             ;; 's-w': Switch workspace.
             ([?\s-w] . other-exwm-workspace)
+            ([?\C-c ?w] . other-exwm-workspace)
             ([?\s-o] . ace-window)
+            ([?\C-c ?o] . ace-window)
             ([?\s-f] . exwm-input-toggle-keyboard)
             ;; 's-&': Launch application.
             ([?\s-&] . (lambda (command)
@@ -131,6 +169,7 @@
             ([?\s-e] . multi-vterm)
             ([?\s-u] . vterm)
             ([?\s-i] . pomidor)
+            ([?\C-c ?i] . pomidor)
             ([?\s-a] . popper-toggle-type)
             ([?\s-s] . popper-toggle-latest)
             ([?\s-h] . popper-cycle)
