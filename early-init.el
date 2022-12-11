@@ -30,7 +30,7 @@
 (add-hook 'emacs-startup-hook
           (lambda ()
             (setq gc-cons-threshold me/gc-cons-threshold
-                  gc-cons-percentage 0.1)))
+                  gc-cons-percentage 0.4)))
 
 ;; max memory available for gc when opening minibuffer
 (defun me/defer-garbage-collection-h ()
@@ -62,9 +62,10 @@
   (setq read-process-output-max 4194304))
 
 ;; [[https://github.com/raxod502/straight.el][straight.el]] is used to download packages for us from all over the web. It stores them all in their respective git folders in =.emacs.d/straight=, which makes debugging, and contributing fixes back upstream as easy as possible.
-(setq straight-use-package-by-default t      
+(setq straight-use-package-by-default t
       straight-cache-autoloads t
-      straight-vc-git-default-clone-depth 1)
+      straight-vc-git-default-clone-depth 1      
+      )
 
 ;; Make sude that straight lets you debug on error
 (setq debug-on-error t)
@@ -86,7 +87,7 @@
 ;; Bootstrap straight to get use-package
 (require 'straight-x)
 (straight-use-package 'use-package)
-
+(straight-use-package 'org)
 ;; We use [[https://github.com/jschaf/esup][esup]] and [[https://github.com/dholm/benchmark-init-el][benchmark-init-el]] to keep tabs on our startup speed.
 (use-package esup
   :demand t

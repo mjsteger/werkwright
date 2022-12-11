@@ -1,4 +1,5 @@
 (use-package org
+  :demand t
   :hook (org-mode . ms/org-mode-setup)
   :config
   (defun ms/org-mode-setup ()
@@ -7,7 +8,19 @@
     (auto-fill-mode 0)
     (visual-line-mode 1))
   (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t))
+        org-hide-emphasis-markers t)
+  ;; Make sure org-indent face is available
+  (require 'org-indent)
+
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  )
 
 ;; Org stuff shamelessly stolen from https://systemcrafters.net/emacs-from-scratch/org-mode-basics/
 (use-package org-bullets
@@ -33,17 +46,6 @@
                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 
-;; Make sure org-indent face is available
-(require 'org-indent)
-
-;; Ensure that anything that should be fixed-pitch in Org files appears that way
-(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
 (defvar home (expand-file-name "~/"))
 (setq org-return-follows-link t)
@@ -61,20 +63,15 @@
 (setq org-agenda-files '())
 
 (--each (list
-         "calls"
          "office"
-         "home"
-         "anywhere"
-         "errands"
-         "at_computer"
          "inbox"
          "projects"
          "read-review"
          "appointments"
          "refile-beorg"
-         "consulting"
          "google-cal"
          "todo"
+         "agenda/jamie"
          )
   (add-org-name-to-agenda it 'make-org-name))
 
@@ -89,26 +86,14 @@
                                      "** TODO %?\n :@calls:  %i Filed on: %U\n" )
                                     ("o" "work" entry (file "~/national/gtd/inbox.org")
                                      "** TODO %? :@work:\n  %i Filed on: %U\n")
-                                    ("T" "Consulting" entry (file "~/national/gtd/consulting.org")
-                                     "** TODO %?\n  %i Filed on: %U\n")
-                                    ("h" "Home" entry (file "~/national/gtd/home.org")
-                                     "** TODO %?\n  %i Filed on: %U\n")
-                                    ("A" "Anywhere" entry (file "~/national/gtd/anywhere.org")
-                                     "** TODO %?\n  %i Filed on: %U\n")
                                     ("j" "Jamie Agenda" entry (file "~/national/gtd/agenda/jamie.org")
                                      "** Scheduled %?\n  %i Filed on: %U\n")
                                     ("a" "Appointments" entry (file "~/national/gtd/appointments.org")
                                      "** Scheduled %?\n  %i Filed on: %U\n")
-                                    ("e" "Errands" entry (file "~/national/gtd/errands.org")
-                                     "** TODO %?\n  %i Filed on: %U\n")
-                                    ("C" "At computer" entry (file "~/national/gtd/at_computer.org")
-                                     "** TODO %?\n  %i Filed on: %U\n")
                                     ("s" "Someday/Maybe" entry (file "~/national/gtd/someday-maybe.org")
                                      "** %?\n %i Filed on: %U\n")
                                     ("r" "Read-review" entry (file "~/national/gtd/read-review.org")
                                      "** TODO %?\n %i Filed on: %U\n")
-                                    ("S" "Standup" entry (file "~/national/gtd/agenda/standup.org")
-                                     "** Scheduled %?\n  %i Filed on: %U\n")
                                     ("E" "Emotion Tracking" entry (file "~/national/gtd/emotion_tracking.org")
                                      "* %U\n** What are you feeling? Where are you feeling it?[[https://humansystems.co/emotionwheels/][See this]]%?\n** What Happened?\n** What was the situation/trigger?\n** What did you feel?\n** How did you react?\n** What were the consequences(good/bad) of that reaction?"))))
 
@@ -121,16 +106,7 @@
 (setq org-fast-tag-selection-include-todo t)
 
 
-(use-package org-jira)
 (setq org-agenda-skip-additional-timestamps-same-entry t)
-
-(use-package org-pomodoro
-  :after org
-  :config
-  (setq org-pomodoro-keep-killed-pomodoro-time t))
-
-
-
 
 (use-package pomidor
   :custom
@@ -153,6 +129,7 @@
 (setq org-refile-use-outline-path 'file)
 
 (setq org-tag-alist '(
+                      ("@emacs" . ?s)
                       ("@work" . ?o)
                       ("@home" . ?h)
                       ("@computer" . ?m)
@@ -178,8 +155,12 @@
   (string= "TODO" (org-get-todo-state)))
 
 (setq org-agenda-custom-commands
-      '(("o" "Work related stuff" tags-todo "@work"
+      '(("n" "Next up" todo "TODO" nil)
+        ("o" "Work related stuff" tags-todo "@work"
          ((org-agenda-overriding-header "Work")
+          (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+        ("e" "emacs related stuff" tags-todo "@emacs"
+         ((org-agenda-overriding-header "Emacs")
           (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
         ("h" "Home related stuff" tags-todo "@home"
          ((org-agenda-overriding-header "Home")
@@ -191,5 +172,41 @@
 
 (with-eval-after-load 'org
   (define-key org-mode-map (kbd "C-c C-q") #'counsel-org-tag))
+
+(setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t%-6e% s")
+                                (todo . " %i %-12:c %-6e")
+                                (tags . " %i %-12:c %-6e")
+                                (search . " %i %-12:c")))
+
+(use-package org-super-agenda
+  :config
+  (setq org-super-agenda-groups
+       '(;; Each group has an implicit boolean OR operator between its selectors.
+         (:name "Today"  ; Optionally specify section name
+                :time-grid t  ; Items that appear on the time grid
+                :todo "TODAY")  ; Items that have this TODO keyword
+         (:name "Important"
+                ;; Single arguments given alone
+                :tag "bills"
+                :priority "A")
+         ;; Groups supply their own section names when none are given
+         (:todo "WAITING" :order 8)  ; Set order of this section
+         (:todo ("Scheduled" "TO-READ" "CHECK" "TO-WATCH" "WATCHING")
+                ;; Show this group at the end of the agenda (since it has the
+                ;; highest number). If you specified this group last, items
+                ;; with these todo keywords that e.g. have priority A would be
+                ;; displayed in that group instead, because items are grouped
+                ;; out in the order the groups are listed.
+                :order 9)
+         (:priority<= "B"
+                      ;; Show this section after "Today" and "Important", because
+                      ;; their order is unspecified, defaulting to 0. Sections
+                      ;; are displayed lowest-number-first.
+                      :order 1)
+         ;; After the last group, the agenda will display items that didn't
+         ;; match any of these groups, with the default order position of 99
+         )))
+
+
 
 (provide 'werkwright-org)
