@@ -543,7 +543,7 @@ If the input is empty, select the previous history element instead."
 (use-package multi-vterm :ensure t)
 
 ;; For the love of god - when you type something w/ a mark, delete that
-(delete-selection-mode +1)
+(delete-selection-mode 1)
 
 ;; Shameless stolen from perspective's thoughts - https://github.com/nex3/perspective-el#some-musings-on-emacs-window-layouts
 (customize-set-variable 'display-buffer-base-action
