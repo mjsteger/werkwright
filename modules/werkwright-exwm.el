@@ -14,7 +14,7 @@
     (-first (lambda (buf) (s-match name (buffer-name buf))) (buffer-list)))
 
   (defun switch-to-buffer-named (name)
-    (exwm-workspace-switch-to-buffer (get-buffer-by-name name)))
+    (pop-to-buffer (get-buffer-by-name name)))
 
   (defun unfuck-modmap ()
     (interactive)
@@ -22,25 +22,31 @@
 
   (defhydra "exwm-buffers" ()
     "common buffers"
-    ("f" (lambda () (interactive) (switch-to-buffer-named "firefox-default:")) :exit t)
+    ("m" (lambda () (interactive) (switch-to-buffer-named "firefox-default:Meet - ")) :exit t)
+    ("f" (lambda () (interactive) (switch-to-buffer-named "firefox-default:[^(Meet)]")) :exit t)
     ("s" (lambda () (interactive) (switch-to-buffer-named "Slack:")) :exit t)
     ("c" (lambda () (interactive) (switch-to-buffer-named "*scratch*")) :exit t)
-    ("g" (lambda () (interactive) (switch-to-buffer-named "groundcontrol")) :exit t))
+    ("g" (lambda () (interactive) (switch-to-buffer-named "groundcontrol")) :exit t)
+    ("d" (lambda () (interactive) (switch-to-buffer-named "doit")) :exit t)
+    )
+
+  ;; Put here since it's effectively overriding an option here
 
   (defhydra "exwm-control" (global-map "C-c")
     "exwm"
     ("w" other-exwm-workspace "go to other workspace" :exit t)
     ("o" ace-window "ace around" :exit t)
-    ("C-x c" (lambda () (interactive) (start-process-shell-command "go to other screen" nil "/home/msteger/bin/send_monitors")))
+    ("C-x C-j" org-clock-goto "goto clock" :exit t)
+    ("C-x bye" (lambda () (interactive) (start-process-shell-command "go to other screen" nil "/home/msteger/bin/send_monitors")) :exit t)
     ("i" pomidor "pomidor")
     ("u" vterm "vterming" :exit t)
     ("d" popper-toggle-type "toggle popper type" :exit t)
     ("s" popper-toggle-latest "toggle latest popper" :exit t)
     ("h" popper-cycle "cycle popper" :exit t)
     ("t" popper-kill-latest-popup "kill last popper popup" :exit t)
-    ("." smudge-command-map :exit t)
     ("n" multi-vterm-next "next vterm")
     ("y" multi-vterm-prev "prev vterm")
+    ("." #'hydra-spotify/body "spotify controls" :exit t)
     ("e" multi-vterm "make a new multi vterm" :exit t)
     ("9" unfuck-modmap "unfuck modmap" :exit t)
     ("[" winner-undo "winner undo")
@@ -71,7 +77,7 @@
                       ([?\C-d] . [delete])
                       ([?\C-k] . [S-end ?\C-c delete])
                       ([?\C-x ?h] . [?\C-a])
-                      ([?\h] . [?\C-d])
+                      ([?\C-i] . [?\C-d])
                       )))
              ((and exwm-class-name
                        ;; Firefox
@@ -91,7 +97,7 @@
                       ([?\C-d] . [delete])
                       ([?\C-k] . [S-end ?\C-c delete])
                       ([?\C-x ?h] . [?\C-a])
-                      ([?\h] . [?\C-d])
+                      ([?\C-i] . [?\C-d])
                       )))
                   ((and exwm-class-name
                        ;; Slack
@@ -133,15 +139,13 @@
   (interactive)
   (exwm-workspace-rename-buffer
    (concat exwm-class-name ":"
-           (if (<= (length exwm-title) 30) exwm-title
-             (concat (substring exwm-title 0 29) "...")))))
+           (if (<= (length exwm-title) 50) exwm-title
+             (concat (substring exwm-title 0 49) "...")))))
 
 ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
 (add-hook 'exwm-update-class-hook 'exwm-rename-buffer)
 (add-hook 'exwm-update-title-hook 'exwm-rename-buffer)
 
-;; TODO:
-;; Should update to allow C-d to go through on meet if the exwm-title changes to Meet something
 ;; TODO: should allow workspaces, but I need to either fix ace, or better, hack winum mode understand letters instead of numbers(and don't wait for enter to do the thing, christ)
 (setq exwm-workspace-number 2)
 (setq exwm-input-global-keys
@@ -193,7 +197,7 @@
 
 (require 'exwm-randr)
 
-(setq exwm-randr-workspace-output-plist '(0 "HDMI-1" 1 "DP-2-8"))
+(setq exwm-randr-workspace-output-plist '(0 "HDMI-1" 1 "DP-1-8"))
 
 (exwm-randr-enable)
 

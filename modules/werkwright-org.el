@@ -7,8 +7,6 @@
     (variable-pitch-mode 1)
     (auto-fill-mode 0)
     (visual-line-mode 1))
-  (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t)
   ;; Make sure org-indent face is available
   (require 'org-indent)
 
@@ -121,6 +119,8 @@
 (setq org-refile-targets
       `((nil :maxlevel . 1)
         (,(make-org-name "someday-maybe") :maxlevel . 1)
+        (,(make-org-name "weekly-review") :maxlevel . 1)
+        (,(make-org-name "monthly-review") :maxlevel . 1)
         (org-agenda-files :maxlevel . 1)))
 
 ;; Allow new nodes/setup so that ivy doesn't get sad

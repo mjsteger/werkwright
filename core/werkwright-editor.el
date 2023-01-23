@@ -315,9 +315,10 @@ The body of the advice is in BODY."
   (global-undo-tree-mode)
   (diminish 'undo-tree-mode)
   ;; Compress history after it gets too big
-  (defadvice undo-tree-make-history-save-file-name
-      (after undo-tree activate)
-    (setq ad-return-value (concat ad-return-value ".gz"))))
+  ;; (defadvice undo-tree-make-history-save-file-name
+  ;;     (after undo-tree activate)
+  ;;   (setq ad-return-value (concat ad-return-value ".gz")))
+  )
 
 ;; enable winner-mode to manage window configurations
 (winner-mode +1)
@@ -325,9 +326,9 @@ The body of the advice is in BODY."
 (keymap-global-set "M-]" 'winner-redo)
 
 (use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
   :config
-  (rainbow-delimiters-mode +1)
-  :hook (prog-mode . rainbow-delimiters-mode))
+  (rainbow-delimiters-mode +1))
 
 (use-package diff-hl
   :config

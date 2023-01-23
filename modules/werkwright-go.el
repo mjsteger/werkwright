@@ -3,6 +3,11 @@
 (require 'werkwright-lsp)
 (require 'lsp-go)
 
+(require 'dap-dlv-go)
+(require 'dap-hydra)
+(add-hook 'dap-stopped-hook
+          (lambda (arg) (call-interactively #'dap-hydra)))
+
 (use-package company
   :config
   (setq company-backends (-concat '((company-capf)) company-backends)))
@@ -13,25 +18,30 @@
               (setq my-flycheck-local-cache '((go-gofmt . ((next-checkers . (go-golint)))))))))
 
 (add-hook 'go-mode-hook '(lambda ()
-                           (require 'lsp)
                            (company-mode)
                            (when (< (count-lines (point-min) (point-max)) 20000)
+
                              (progn
-                               (lsp-deferred)
+                               (lsp)
+                               ;; If you deferred you'd have to chain on setting the flycheck checker. Blegh
+                               ;; (lsp-deferred)
+                               (setq-local flycheck-checker 'go-gofmt)
+                               (flycheck-select-checker 'go-gofmt)
+                               (setq-local flycheck-checker 'go-gofmt)
                                ))
+
                            (keymap-local-set "M-." #'lsp-find-definition)
-                           (flycheck-select-checker 'go-gofmt)
                            (add-hook 'before-save-hook 'gofmt-before-save)
+                           (add-hook 'before-save-hook #'lsp-organize-imports)
                            (setq gofmt-show-errors nil)
                            ;; Because this lags big time on any large codebase
                            (setq lsp-enable-file-watchers nil)))
 
-;; unfortunately not available if we want to do the degradeclosed stuff
-;; (add-hook 'go-mode-hook #'lsp-organize-imports)
+
 (lsp-register-custom-settings
  '(("gopls.completeUnimported" t t)
    ("gopls.experimentalPackageCacheKey" t t)
-   ("gopls.memoryMode" "DegradeClosed" nil)
+   ;; ("gopls.memoryMode" "Normal" nil)
    ("gopls.staticcheck" t t)))
 
 (setq flycheck-error-list-format `[("Line" 20 flycheck-error-list-entry-< :right-align t)
@@ -49,9 +59,7 @@
               (("C-c C-c C-f" . go-test-current-file)
                ("C-C C-C C-c" . go-test-current-test)
               ("C-c C-c C-t" . go-test-current-project)
-              ))
-  :config
-  (add-to-list 'popper-reference-buffers 'go-test-mode))
+              )))
 
 (use-package go-playground)
 

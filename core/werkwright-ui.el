@@ -161,7 +161,6 @@
 
 (use-package smart-mode-line
   :init
-  (setq sml/theme 'respectful)
   (setq sml/mode-width 1)
   (line-number-mode t)
   (column-number-mode t)
@@ -171,7 +170,7 @@
   (setq display-time-default-load-average nil)
   (display-time-mode 1)
   (smart-mode-line-enable)
-  (set-face-attribute 'mode-line nil :inherit 'variable-pitch)
+  ;; (set-face-attribute 'mode-line nil :inherit 'variable-pitch)
   (sml/apply-theme 'respectful))
 
 ;; more useful frame title, that show either a file or a
@@ -180,5 +179,4 @@
       '("" invocation-name " Werkwright - " (:eval (if (buffer-file-name)
                                             (abbreviate-file-name (buffer-file-name))
                                             "%b"))))
-
 (provide 'werkwright-ui)
