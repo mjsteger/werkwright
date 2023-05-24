@@ -12,21 +12,22 @@
   :config
   (setq company-backends (-concat '((company-capf)) company-backends)))
 
+
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
             (when (derived-mode-p 'go-mode)
+
               (setq my-flycheck-local-cache '((go-gofmt . ((next-checkers . (go-golint)))))))))
 
 (add-hook 'go-mode-hook '(lambda ()
-                           (company-mode)
+                           ;; (company-mode)
                            (when (< (count-lines (point-min) (point-max)) 20000)
 
                              (progn
                                (lsp)
                                ;; If you deferred you'd have to chain on setting the flycheck checker. Blegh
                                ;; (lsp-deferred)
-                               (setq-local flycheck-checker 'go-gofmt)
-                               (flycheck-select-checker 'go-gofmt)
+                               ;; (flycheck-add-next-checker 'go-errcheck '(warning . lsp))
                                (setq-local flycheck-checker 'go-gofmt)
                                ))
 
@@ -37,10 +38,8 @@
                            ;; Because this lags big time on any large codebase
                            (setq lsp-enable-file-watchers nil)))
 
-
 (lsp-register-custom-settings
  '(("gopls.completeUnimported" t t)
-   ("gopls.experimentalPackageCacheKey" t t)
    ;; ("gopls.memoryMode" "Normal" nil)
    ("gopls.staticcheck" t t)))
 
@@ -62,6 +61,38 @@
               )))
 
 (use-package go-playground)
+
+
+;; I'm sure there's a better way, but boy is it a pain to debug
+(flycheck-remove-next-checker 'go-gofmt 'go-golint)
+(flycheck-remove-next-checker 'go-gofmt 'go-vet)
+(flycheck-remove-next-checker 'go-gofmt 'go-build)
+(flycheck-remove-next-checker 'go-gofmt 'go-test)
+(flycheck-remove-next-checker 'go-gofmt 'go-errcheck)
+(flycheck-remove-next-checker 'go-gofmt 'go-unconvert)
+(flycheck-remove-next-checker 'go-gofmt 'go-staticcheck)
+
+(flycheck-remove-next-checker 'go-errcheck 'go-staticcheck)
+
+(flycheck-remove-next-checker 'go-golint 'go-errcheck)
+(flycheck-remove-next-checker 'go-golint 'go-unconvert)
+(flycheck-remove-next-checker 'go-golint 'go-build)
+(flycheck-remove-next-checker 'go-golint 'go-test)
+
+(flycheck-remove-next-checker 'go-vet 'go-build)
+(flycheck-remove-next-checker 'go-vet 'go-test)
+(flycheck-remove-next-checker 'go-vet 'go-errcheck)
+(flycheck-remove-next-checker 'go-vet 'go-unconvert)
+(flycheck-remove-next-checker 'go-vet 'go-staticcheck)
+
+
+
+(flycheck-add-next-checker 'go-gofmt 'go-staticcheck)
+(flycheck-add-next-checker 'go-staticcheck 'go-errcheck)
+(flycheck-add-next-checker 'go-errcheck 'go-unconvert)
+(flycheck-add-next-checker 'go-unconvert 'go-golint)
+(flycheck-add-next-checker 'go-golint 'go-vet)
+
 
 
 (provide 'werkwright-go)
