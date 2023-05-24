@@ -8,13 +8,26 @@
     (when (equal (nth i exwm-workspace--list) exwm-workspace--current)
       (return (exwm-workspace-switch (mod (+ 1 i) (length exwm-workspace--list)))))))
 
+(setq avy-keys '(?a ?s ?h ?t ?n ?e ?o ?i))
+
 (use-package hydra
   :config
   (defun get-buffer-by-name (name)
     (-first (lambda (buf) (s-match name (buffer-name buf))) (buffer-list)))
 
+  ;; If the buffer is displayed, switched to it
+  ;; If it's not displayed, then simply make this current window be that buffer
   (defun switch-to-buffer-named (name)
-    (pop-to-buffer (get-buffer-by-name name)))
+    (let ((buffer (get-buffer-by-name name)))
+      (if (get-buffer-window buffer t)
+          ;; If it's the same workspace, pop buffer is what we want. if it's not, unfortunately, it's exwm-workspace-switch-to-buffer
+          (if (get-buffer-window buffer)
+            (pop-to-buffer buffer)
+          (exwm-workspace-switch-to-buffer buffer))
+        (let ((exwm-layout-show-all-buffers t)
+              (exwm-workspace-show-all-buffers t))
+          (exwm-workspace-switch-to-buffer buffer)))
+      ))
 
   (defun unfuck-modmap ()
     (interactive)
@@ -44,6 +57,8 @@
     ("s" popper-toggle-latest "toggle latest popper" :exit t)
     ("h" popper-cycle "cycle popper" :exit t)
     ("t" popper-kill-latest-popup "kill last popper popup" :exit t)
+    ("f" avy-goto-char "avy gotoword" :exit t)
+    ("j" avy-goto-char-2 "avy gotoword" :exit t)
     ("n" multi-vterm-next "next vterm")
     ("y" multi-vterm-prev "prev vterm")
     ("." #'hydra-spotify/body "spotify controls" :exit t)
@@ -197,7 +212,7 @@
 
 (require 'exwm-randr)
 
-(setq exwm-randr-workspace-output-plist '(0 "HDMI-1" 1 "DP-1-8"))
+(setq exwm-randr-workspace-output-plist '(0 "DP-1" 1 "HDMI-2"))
 
 (exwm-randr-enable)
 

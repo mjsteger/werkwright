@@ -25,7 +25,8 @@
 
 
 ;; ;; max memory available for gc on startup
-(defvar me/gc-cons-threshold 1600000)
+(defvar me/gc-cons-threshold (* 8 1600000))
+;; (defvar me/gc-cons-threshold 1600000)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 (add-hook 'emacs-startup-hook
@@ -105,6 +106,6 @@
               (time-subtract after-init-time before-init-time)))
             gcs-done)))
 
-(use-package gcmh
-  :config
-  (gcmh-mode))
+;; (use-package gcmh
+;;   :config
+;;   (gcmh-mode))

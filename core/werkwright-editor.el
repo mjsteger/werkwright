@@ -308,13 +308,17 @@ The body of the advice is in BODY."
 ;; supercharge your undo/redo with undo-tree
 (use-package undo-tree
   :config
-  ;; autosave the undo-tree history
-  (setq undo-tree-history-directory-alist
-        `((".*" . ,temporary-file-directory)))
-  (setq undo-tree-auto-save-history t)
   (global-undo-tree-mode)
   (diminish 'undo-tree-mode)
-  ;; Compress history after it gets too big
+  (setq undo-tree-dir (concat user-emacs-directory "undo"))
+  (setq undo-tree-auto-save-history nil)
+  ;; autosave the undo-tree history
+  (setq undo-tree-history-directory-alist
+        `((".*" . ,undo-tree-dir)))
+  (setq undo-in-region t)
+  (setq undo-tree-enable-undo-in-region t)
+  (setq undo-tree-auto-save-history t)
+  ;; Compress history after it gets too big  
   ;; (defadvice undo-tree-make-history-save-file-name
   ;;     (after undo-tree activate)
   ;;   (setq ad-return-value (concat ad-return-value ".gz")))

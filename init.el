@@ -59,12 +59,13 @@ are loaded automatically by Werkwright.")
 ;; Include these so I can use fancy mapping in core stuff
 (use-package dash)
 (use-package s)
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 (--each '(
-	  werkwright-packages
-	  werkwright-ui
-	  werkwright-core
-	  werkwright-editor)
+          werkwright-packages
+          werkwright-ui
+          werkwright-core
+          werkwright-editor)
   (require it))
 
 
@@ -97,4 +98,3 @@ are loaded automatically by Werkwright.")
 (provide 'init)
 
 ;;; init.el ends here
-
