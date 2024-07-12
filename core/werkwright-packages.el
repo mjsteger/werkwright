@@ -53,7 +53,7 @@ PACKAGE is installed only if not already present.  The file is opened in MODE."
     ("\\.elixir\\'" elixir-mode elixir-mode)
     ("\\.erl\\'" erlang erlang-mode)
     ("\\.feature\\'" feature-mode feature-mode)
-    ("\\.go\\'" go-mode go-mode)
+    ("\\.go\\'" go-ts-mode go-ts-mode)
     ("\\.graphql\\'" graphql-mode graphql-mode)
     ("\\.groovy\\'" groovy-mode groovy-mode)
     ("\\.pdf\\'" pdf-tools doc-view-mode)

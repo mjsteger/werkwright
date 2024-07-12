@@ -64,7 +64,7 @@
       savehist-autosave-interval 60
       ;; keep the home clean
       savehist-file (expand-file-name "savehist" werkwright-savefile-dir))
-(savehist-mode +1)
+(savehist-mode)
 
 ;; save recent files
 (use-package recentf
@@ -310,8 +310,7 @@ The body of the advice is in BODY."
   :config
   (global-undo-tree-mode)
   (diminish 'undo-tree-mode)
-  (setq undo-tree-dir (concat user-emacs-directory "undo"))
-  (setq undo-tree-auto-save-history nil)
+  (setq undo-tree-dir (concat user-emacs-directory "undo"))  
   ;; autosave the undo-tree history
   (setq undo-tree-history-directory-alist
         `((".*" . ,undo-tree-dir)))

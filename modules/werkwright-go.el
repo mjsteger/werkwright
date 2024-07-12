@@ -1,5 +1,7 @@
 (use-package dap-mode)
 
+
+(add-hook 'before-save-hook #'gofmt-before-save)
 (require 'werkwright-lsp)
 (require 'lsp-go)
 
@@ -12,14 +14,24 @@
   :config
   (setq company-backends (-concat '((company-capf)) company-backends)))
 
+(use-package go-mode)
+;; Gotta define it before we use it here as otherwise we'll end up with go-mode's version that won't do anything for go-ts-mode
+(defun gofmt-before-save ()
+  "Add this to .emacs to run gofmt on the current buffer when saving:
+\(add-hook 'before-save-hook 'gofmt-before-save).
+Note that this will cause ‘go-mode’ to get loaded the first time
+you save any file, kind of defeating the point of autoloading."
+
+  (interactive)
+  (when (eq major-mode 'go-ts-mode) (gofmt))) ;NOTE: Use tree-sitter implementation of go
 
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
-            (when (derived-mode-p 'go-mode)
+            (when (derived-mode-p 'go-ts-mode)
 
               (setq my-flycheck-local-cache '((go-gofmt . ((next-checkers . (go-golint)))))))))
 
-(add-hook 'go-mode-hook '(lambda ()
+(add-hook 'go-ts-mode-hook '(lambda ()
                            ;; (company-mode)
                            (when (< (count-lines (point-min) (point-max)) 20000)
 
@@ -32,7 +44,7 @@
                                ))
 
                            (keymap-local-set "M-." #'lsp-find-definition)
-                           (add-hook 'before-save-hook 'gofmt-before-save)
+                           (add-hook 'before-save-hook #'gofmt-before-save)
                            (add-hook 'before-save-hook #'lsp-organize-imports)
                            (setq gofmt-show-errors nil)
                            ;; Because this lags big time on any large codebase
@@ -53,8 +65,8 @@
   :defines popper-reference-buffers
   :init
   ;; If you don't require it first, if it requires in later it will overwrite our binds here
-  (require 'go-mode)
-  :bind (:map go-mode-map
+  (require 'go-ts-mode)
+  :bind (:map go-ts-mode-map
               (("C-c C-c C-f" . go-test-current-file)
                ("C-C C-C C-c" . go-test-current-test)
               ("C-c C-c C-t" . go-test-current-project)

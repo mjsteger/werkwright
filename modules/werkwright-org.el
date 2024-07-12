@@ -10,7 +10,7 @@
   ;; Make sure org-indent face is available
   (require 'org-indent)
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  ;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
@@ -70,6 +70,7 @@
          "google-cal"
          "todo"
          "agenda/jamie"
+         "waiting-for"
          )
   (add-org-name-to-agenda it 'make-org-name))
 
@@ -132,6 +133,8 @@
                       ("@emacs" . ?s)
                       ("@work" . ?o)
                       ("@home" . ?h)
+                      ("@agenda" . ?i)
+                      ("@ctx-home" . ?t)
                       ("@computer" . ?m)
                       ("@calls" . ?a)
                       ("@anywhere" . ?y)
@@ -154,8 +157,43 @@
 (defun org-current-is-todo ()
   (string= "TODO" (org-get-todo-state)))
 
+(defun my-org-agenda-projects-no-next ()
+  "Skip all but the first non-done entry."
+  (let (should-skip-entry)
+    (if (org-current-is-todo)
+      (setq should-skip-entry nil))
+    (save-excursion
+      (while (and (not should-skip-entry) (org-goto-sibling t))
+        (when (org-current-is-todo)
+          (setq should-skip-entry nil))))
+    (when should-skip-entry
+      (or (outline-next-heading)
+          (goto-char (point-max))))))
+
+(defun bh/is-project-p ()
+  "Any task with a todo keyword subtask"
+  (save-restriction
+    (widen)
+    (let ((has-subtask)
+          (subtree-end (save-excursion (org-end-of-subtree t)))
+          (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+      (save-excursion
+        (forward-line 1)
+        (while (and (not has-subtask)
+                    (< (point) subtree-end)
+                    (re-search-forward "^\*+ " subtree-end t))
+          (when (member (org-get-todo-state) org-todo-keywords-1)
+            (setq has-subtask t))))
+      (and is-a-task has-subtask))))
+
+;; Don't exclude projects with 'done' and nothing else,
+(setq org-stuck-projects '("+LEVEL=2/-DONE" ("TODO" "NEXT" "NEXTACTION") nil ""))
+
 (setq org-agenda-custom-commands
-      '(("n" "Next up" todo "TODO" nil)
+      '(("n" "Next up" todo nil ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+        ("p" "stuck projects" ((stuck "" ((org-agenda-files '("~/national/gtd/projects.org"))))) nil)
+        ("P" "All projects" ((tags "+LEVEL=1/" ((org-agenda-files '("~/national/gtd/projects.org"))))) nil
+         ((org-agenda-skip-function #'my-org-agenda-projects-no-next)))
         ("o" "Work related stuff" tags-todo "@work"
          ((org-agenda-overriding-header "Work")
           (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))

@@ -7,7 +7,7 @@
 
 ;; Added this nonsense because I was getting recursive loads from jka-compr
 (setq load-prefer-newer nil)
-(require 'jka-compr)
+; (require 'jka-compr)
 
 ;; Always load newest byte code
 (setq load-prefer-newer t)
@@ -59,7 +59,7 @@ are loaded automatically by Werkwright.")
 ;; Include these so I can use fancy mapping in core stuff
 (use-package dash)
 (use-package s)
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
 
 (--each '(
           werkwright-packages
@@ -67,7 +67,7 @@ are loaded automatically by Werkwright.")
           werkwright-core
           werkwright-editor)
   (require it))
-
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 ;; macOS specific settings
 (when (eq system-type 'darwin)

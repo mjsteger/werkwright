@@ -1,3 +1,5 @@
+(use-package winum)
+
 (use-package ace-window
   :config
   (setq aw-keys '(?a ?s ?h ?t ?n ?e ?o ?i ?9))

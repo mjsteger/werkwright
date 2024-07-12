@@ -23,4 +23,8 @@
   (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
   (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent))
 
+(use-package keychain-environment
+  :config
+  (keychain-refresh-environment))
+
 (provide 'werkwright-magit)

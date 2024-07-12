@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 (use-package exwm-edit
   :config
   (require 'exwm-edit))
@@ -33,30 +35,65 @@
     (interactive)
     (start-process-shell-command "reset keys" nil "~/bin/unfuck-modmap.sh"))
 
-  (defhydra "exwm-buffers" ()
-    "common buffers"
-    ("m" (lambda () (interactive) (switch-to-buffer-named "firefox-default:Meet - ")) :exit t)
-    ("f" (lambda () (interactive) (switch-to-buffer-named "firefox-default:[^(Meet)]")) :exit t)
-    ("s" (lambda () (interactive) (switch-to-buffer-named "Slack:")) :exit t)
-    ("c" (lambda () (interactive) (switch-to-buffer-named "*scratch*")) :exit t)
-    ("g" (lambda () (interactive) (switch-to-buffer-named "groundcontrol")) :exit t)
-    ("d" (lambda () (interactive) (switch-to-buffer-named "doit")) :exit t)
+
+
+
+
+  (defvar exwm-buffers '(("m" (lambda () (interactive) (switch-to-buffer-named "firefox-default:Meet - ")) :exit t)
+                         ("f" (lambda () (interactive) (switch-to-buffer-named "firefox-default:[^(Meet)]")) :exit t)
+                         ("s" (lambda () (interactive) (switch-to-buffer-named "Slack:")) :exit t)
+                         ("c" (lambda () (interactive) (switch-to-buffer-named "*scratch*")) :exit t)
+                         ("g" (lambda () (interactive) (switch-to-buffer-named "groundcontrol")) :exit t)
+                         ("d" (lambda () (interactive) (switch-to-buffer-named "doit")) :exit t)
+                         ))
+
+  (defun add-to-buffer-hotkeys (str)
+    (interactive "sWhat letter to assign for this buffer?: ")
+    (let ((used-letters (-map 'first exwm-buffers)))
+      (if (-contains? used-letters str)
+          (message "Cannot use letter %s, please use a different letter. Used letters: %s" str used-letters)
+        (setq exwm-buffers (append (list (list str (
+                                                    (lambda (buffer-name) (lambda () (interactive) (switch-to-buffer-named buffer-name)))
+                                                    (buffer-name))
+
+                                               :exit t))
+                                   exwm-buffers))))
+    ;; Have to force re-eval it, not using defhydra+ because of multi-level macro quoting in that case
+    (re-eval-exwm-buffers)
     )
 
-  ;; Put here since it's effectively overriding an option here
+  (defun remove-from-buffer-hotkeys (str)
+    (interactive "sWhat letter to remove?: ")
+    (let ((used-letters (-map 'first exwm-buffers)))
+      (if (not (-contains? used-letters str))
+          (message "Cannot use letter %s to remove as it does not appear, please use a different letter. Used letters: %s" str used-letters)
+        (setq exwm-buffers (-filter (lambda (x) (not (equal (car x) str))) exwm-buffers))))
 
+    ;; Have to force re-eval it, not using defhydra+ because of multi-level macro quoting in that case
+    (re-eval-exwm-buffers)
+    )
+
+  (defun re-eval-exwm-buffers ()
+    (eval `(defhydra "exwm-buffers" () "common-buffers" ,@exwm-buffers)))
+
+  (re-eval-exwm-buffers)
+
+  ;; Put here since it's effectively overriding an option here
   (defhydra "exwm-control" (global-map "C-c")
     "exwm"
     ("w" other-exwm-workspace "go to other workspace" :exit t)
+
     ("o" ace-window "ace around" :exit t)
     ("C-x C-j" org-clock-goto "goto clock" :exit t)
     ("C-x bye" (lambda () (interactive) (start-process-shell-command "go to other screen" nil "/home/msteger/bin/send_monitors")) :exit t)
     ("i" pomidor "pomidor")
     ("u" vterm "vterming" :exit t)
-    ("d" popper-toggle-type "toggle popper type" :exit t)
-    ("s" popper-toggle-latest "toggle latest popper" :exit t)
-    ("h" popper-cycle "cycle popper" :exit t)
-    ("t" popper-kill-latest-popup "kill last popper popup" :exit t)
+    ;; ("d" popper-toggle-type "toggle popper type" :exit t)
+    ;; ("s" popper-toggle-latest "toggle latest popper" :exit t)
+    ;; ("h" popper-cycle "cycle popper" :exit t)
+    ;; ("t" popper-kill-latest-popup "kill last popper popup" :exit t)
+    ("s" add-to-buffer-hotkeys "add-to-buffer-hotkeys" :exit t)
+    ("h" remove-from-buffer-hotkeys "remove-from-buffer-hotkeys" :exit t)
     ("f" avy-goto-char "avy gotoword" :exit t)
     ("j" avy-goto-char-2 "avy gotoword" :exit t)
     ("n" multi-vterm-next "next vterm")
@@ -76,7 +113,7 @@
             (cond
              ((and exwm-class-name
                        ;; Firefox
-                        (s-matches? ".*firefox-default:Meet -.*" exwm-class-name))
+                        (s-matches? ".*firefox:Meet -.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
                     '(([?\C-p] . [up])
                       ([?\C-y] . [?\C-v])
@@ -96,7 +133,7 @@
                       )))
              ((and exwm-class-name
                        ;; Firefox
-                        (s-matches? ".*firefox-default.*" exwm-class-name))
+                        (s-matches? ".*firefox.*" exwm-class-name))
                    (exwm-input-set-local-simulation-keys
                     '(([?\C-p] . [up])
                       ([?\C-y] . [?\C-v])
@@ -212,8 +249,10 @@
 
 (require 'exwm-randr)
 
-(setq exwm-randr-workspace-output-plist '(0 "DP-1" 1 "HDMI-2"))
+;; (setq exwm-randr-workspace-output-plist '(0 "DP-2" 1 "HDMI-0" 2 "DP-0.8"));
+(setq exwm-randr-workspace-output-plist '(0 "DP-0" 1 "HDMI-0"))
 
+;; ;; Uncomment this after back from Seattle
 (exwm-randr-enable)
 
 (defun main-screen-turn-on()

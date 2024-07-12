@@ -5,7 +5,6 @@
                              go
                              efuncs
                              themes
-                             smudge
                              terraform
                              magit
                              lisp

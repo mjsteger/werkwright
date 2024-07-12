@@ -2,7 +2,9 @@
   :config
   ;; For guix
   (when (string= system-type "gnu/linux")
-    (setq lsp-rust-analyzer-store-path (executable-find "rust-analyzer")))
+    (progn
+      (setq lsp-rust-analyzer-store-path (executable-find "rust-analyzer"))
+      (setenv "LD_LIBRARY_PATH" "/lib64/")))
   (setq rust-format-on-save t)
   (define-key rust-mode-map ";" (kbd "C-q ; RET"))
   (define-key rust-mode-map (kbd "C-j") 'lsp-rust-analyzer-join-lines)
@@ -34,6 +36,8 @@
   (require 'dap-cpptools)
   ;; installs .extension/vscode
   (dap-gdb-lldb-setup)
+  
+  
   (dap-register-debug-template
    "Rust::LLDB Run Configuration"
    (list :type "lldb"

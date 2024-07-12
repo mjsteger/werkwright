@@ -1,8 +1,14 @@
 (use-package smudge
   :config  
   (setq smudge-transport 'dbus)
-  (setq smudge-player-status-truncate-length 70)
-  (global-smudge-remote-mode)
+  (setq smudge-player-status-truncate-length 70)  
+  (global-smudge-remote-mode 1)
+  (defun refresh-smudge-timer()
+    (interactive)  
+    (cancel-timer smudge-controller-timer)
+    (setq smudge-controller-timer nil)
+    (smudge-controller-start-player-status-timer))
+  (advice-add 'smudge-controller-toggle-play :before 'refresh-smudge-timer)
   (eval-after-load 'hydra
     (defhydra hydra-spotify (:hint nil)
       "
@@ -28,5 +34,7 @@ _u_: User Playlists      _r_  : Repeat            _d_: Device
       ("x" smudge-controller-volume-mute-unmute :exit nil)
       ("d" smudge-select-device :exit nil)
       ("q" quit-window "quit" :color blue))))
+
+
 
 (provide 'werkwright-smudge)
